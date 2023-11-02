@@ -6,11 +6,6 @@ use LifeV;
 -- TABLAS --
 -- ------ --
 
-drop table if exists Usuario;
-create table Usuario (id_usuario int auto_increment key not null, 
-						nombre_usuario varchar(100), 
-						contrasena varchar(100));
-
 drop table if exists Perfil;
 create table Perfil (id_perfil int auto_increment key not null, 
 						nombre varchar(100), 
@@ -55,6 +50,14 @@ create table Perfil (id_perfil int auto_increment key not null,
                             end
                         ));
 
+drop table if exists Usuario;
+create table Usuario (id_usuario int auto_increment key not null, 
+						id_perfil int,
+						nombre_usuario varchar(100), 
+						contrasena varchar(100),
+                        foreign key (id_perfil) references LifeV.Perfil (id_perfil));
+
+
 drop table if exists Progreso;
 create table Progreso (id_progreso int auto_increment key not null,
 						id_perfil int,
@@ -79,7 +82,7 @@ create table Dieta (id_dieta int auto_increment key not null,
 
 drop table if exists Plato;
 create table Plato (id_plato int auto_increment key not null,
-						nombre_plato varchar(100),
+                        nombre_plato varchar(100),
                         descripcion_plato varchar(100),
                         calorias float,
                         carbohidratos float,
@@ -104,6 +107,48 @@ create table Registro_comida (id_registro_comida int auto_increment key not null
                         fecha date,
 						foreign key (id_perfil) references LifeV.Perfil (id_perfil),
                         foreign key (id_plato) references LifeV.Plato (id_plato));
+
+drop table if exists Perfil_tiene_Objetivo;
+create table Perfil_tiene_Objetivo (
+						id_perfil int,
+                        id_objetivo int,
+                        foreign key (id_perfil) references LifeV.Perfil (id_perfil),
+                        foreign key (id_objetivo) references LifeV.Objetivo (id_objetivo));
+
+drop table if exists Perfil_sigue_Dieta;
+create table Perfil_sigue_Dieta (
+						id_perfil int,
+                        id_dieta int,
+                        foreign key (id_perfil) references LifeV.Perfil (id_perfil),
+                        foreign key (id_dieta) references LifeV.Dieta (id_dieta));
+
+drop table if exists Objetivo_tiene_Dieta;
+create table Objetivo_tiene_Dieta (
+						id_objetivo int,
+                        id_dieta int,
+                        foreign key (id_objetivo) references LifeV.Objetivo (id_objetivo),
+                        foreign key (id_dieta) references LifeV.Dieta (id_dieta));
+
+drop table if exists Plato_pertenece_Dieta;
+create table Plato_pertenece_Dieta (
+						id_plato int,
+                        id_dieta int,
+                        foreign key (id_plato) references LifeV.Plato (id_plato),
+                        foreign key (id_dieta) references LifeV.Dieta (id_dieta));
+
+drop table if exists Plato_favorito_Perfil;
+create table Plato_favorito_Perfil (
+						id_perfil int,
+                        id_plato int,
+                        foreign key (id_perfil) references LifeV.Perfil (id_perfil),
+                        foreign key (id_plato) references LifeV.Plato (id_plato));
+
+drop table if exists Comida_pertenece_Plato;
+create table Comida_pertenece_Plato (
+						id_plato int,
+                        id_comida int,
+                        foreign key (id_plato) references LifeV.Plato (id_plato),
+                        foreign key (id_comida) references LifeV.Comida (id_comida));
 
 -- -------- --
 -- TRIGGERS --
@@ -171,11 +216,11 @@ DELIMITER ;
 -- INSERTS --
 -- ------- --
 
-insert into Usuario (nombre_usuario, contrasena) values ('bforerob', '12345678');
-insert into Usuario (nombre_usuario, contrasena) values ('pepitap', '12345678');
-
 insert into Perfil (nombre, edad, genero, altura, peso, alergias, nivel_actividad_fisica) values ('Brandolfo Steven', 20, 'Masculino', 1.70, 90, 'Nueces', 'Moderadamente Activo');
 insert into Perfil (nombre, edad, genero, altura, peso, alergias, nivel_actividad_fisica) values ('Pepita Pérez', 20, 'Femenino', 1.70, 55, null, 'Activo');
+
+insert into Usuario (id_perfil, nombre_usuario, contrasena) values (1, 'bforerob', '12345678');
+insert into Usuario (id_perfil, nombre_usuario, contrasena) values (2, 'pepitap', '12345678');
 
 insert into Progreso (id_perfil, peso, nivel_actividad_fisica, fecha) values (1, 120, 'Sedentario', '2023-5-1');
 insert into Progreso (id_perfil, peso, nivel_actividad_fisica, fecha) values (1, 90, 'Moderadamente activo', '2023-10-1');
@@ -191,11 +236,35 @@ insert into Dieta (nombre_dieta, descripcion_dieta) values ('Dieta para subir de
 insert into Plato (nombre_plato, descripcion_plato, calorias, carbohidratos, proteinas, grasas, tipo) values ('Agua molida', 'Se muele el agua', 0, 0, 0, 0, 'Almuerzo');
 insert into Plato (nombre_plato, descripcion_plato, calorias, carbohidratos, proteinas, grasas, tipo) values ('Lechona tolimense', 'Lechona con arroz', 800, 25, 20, 50, 'Desayuno');
 
+insert into Comida (nombre_comida, descripcion_comida, calorias, carbohidratos, proteinas, grasas, tipo) values ('Agua', 'Agua potable', 0, 0, 0, 0, 'Bebida');
 insert into Comida (nombre_comida, descripcion_comida, calorias, carbohidratos, proteinas, grasas, tipo) values ('Lechona', 'Lechona con arroz', 800, 25, 20, 50, 'Alimento proteico');
 insert into Comida (nombre_comida, descripcion_comida, calorias, carbohidratos, proteinas, grasas, tipo) values ('Arroz', 'Lechona con arroz', 800, 25, 20, 50, 'Harina');
 
 insert into Registro_comida (id_perfil, id_plato, fecha) values (1, 1, '2023-10-31');
 insert into Registro_comida (id_perfil, id_plato, fecha) values (2, 2, '2023-10-31');
+
+insert into Perfil_tiene_objetivo (id_perfil, id_objetivo) values (1, 1);
+insert into Perfil_tiene_objetivo (id_perfil, id_objetivo) values (2, 2);
+
+insert into Perfil_sigue_Dieta (id_perfil, id_dieta) values (1, 1);
+insert into Perfil_sigue_Dieta (id_perfil, id_dieta) values (2, 2);
+
+insert into Objetivo_tiene_Dieta (id_objetivo, id_dieta) values (1, 1);
+insert into Objetivo_tiene_Dieta (id_objetivo, id_dieta) values (2, 2);
+
+insert into Plato_pertenece_Dieta (id_plato, id_dieta) values (1, 1);
+insert into Plato_pertenece_Dieta (id_plato, id_dieta) values (2, 2);
+
+insert into Plato_favorito_Perfil (id_perfil, id_plato) values (1, 1);
+insert into Plato_favorito_Perfil (id_perfil, id_plato) values (2, 2);
+
+insert into Comida_pertenece_Plato (id_plato, id_comida) values (1, 1);
+insert into Comida_pertenece_Plato (id_plato, id_comida) values (2, 2);
+insert into Comida_pertenece_Plato (id_plato, id_comida) values (2, 3);
+
+-- ------- --
+-- Selects --
+-- ------- --
 
 select*from Usuario;
 select*from Perfil;
@@ -205,3 +274,9 @@ select*from Dieta;
 select*from Plato;
 select*from Comida;
 select*from Registro_comida;
+select Perfil.id_perfil, Objetivo.id_objetivo, Perfil.nombre, Objetivo.nombre_objetivo from Perfil_tiene_Objetivo join Perfil on Perfil_tiene_Objetivo.id_perfil = Perfil.id_perfil join Objetivo on Perfil_tiene_Objetivo.id_objetivo = Objetivo.id_objetivo;
+select Perfil.id_perfil, Dieta.id_dieta, Perfil.nombre, Dieta.nombre_dieta from Perfil_sigue_Dieta join Perfil on Perfil_sigue_Dieta.id_perfil = Perfil.id_perfil join Dieta on Perfil_sigue_Dieta.id_dieta = Dieta.id_dieta;
+select Objetivo.id_objetivo, Dieta.id_dieta, Objetivo.nombre_objetivo, Dieta.nombre_dieta from Objetivo_tiene_Dieta join Objetivo on Objetivo_tiene_Dieta.id_objetivo = Objetivo.id_objetivo join Dieta on Objetivo_tiene_Dieta.id_dieta = Dieta.id_dieta;
+select Plato.id_plato, Dieta.id_dieta, Plato.nombre_plato, Dieta.nombre_dieta from Plato_pertenece_Dieta join Plato on Plato_pertenece_Dieta.id_plato = Plato.id_plato join Dieta on Plato_pertenece_Dieta.id_dieta = Dieta.id_dieta;
+select Perfil.id_perfil, Plato.id_plato, Perfil.nombre, Plato.nombre_plato from Plato_favorito_Perfil join Plato on Plato_favorito_Perfil.id_plato = Plato.id_plato join Perfil on Plato_favorito_Perfil.id_perfil = Perfil.id_perfil;
+select Plato.id_plato, Comida.id_comida, Plato.nombre_plato, Comida.nombre_comida from Comida_pertenece_Plato join Plato on Comida_pertenece_Plato.id_plato = Plato.id_plato join Comida on Comida_pertenece_Plato.id_comida = Comida.id_comida;
