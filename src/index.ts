@@ -62,7 +62,7 @@ app.post('/login', (req: Request, res: Response) => {
     }
   });
 });
-//
+//register 
 app.post('/register', (req: Request, res: Response) => {
   const { username, password, email } = req.body;
 
