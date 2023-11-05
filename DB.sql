@@ -55,6 +55,7 @@ create table Usuario (id_usuario int auto_increment key not null,
 						id_perfil int,
 						nombre_usuario varchar(100), 
 						contrasena varchar(100),
+						correo varchar(100),
                         foreign key (id_perfil) references LifeV.Perfil (id_perfil));
 
 
@@ -219,8 +220,8 @@ DELIMITER ;
 insert into Perfil (nombre, edad, genero, altura, peso, alergias, nivel_actividad_fisica) values ('Brandolfo Steven', 20, 'Masculino', 1.70, 90, 'Nueces', 'Moderadamente Activo');
 insert into Perfil (nombre, edad, genero, altura, peso, alergias, nivel_actividad_fisica) values ('Pepita Pérez', 20, 'Femenino', 1.70, 55, null, 'Activo');
 
-insert into Usuario (id_perfil, nombre_usuario, contrasena) values (1, 'bforerob', '12345678');
-insert into Usuario (id_perfil, nombre_usuario, contrasena) values (2, 'pepitap', '12345678');
+insert into Usuario (id_perfil, nombre_usuario, contrasena) values (1, 'bforerob', '12345678','emailfalso1@gmail.com');
+insert into Usuario (id_perfil, nombre_usuario, contrasena) values (2, 'pepitap', '12345678','emailfalso2@gmail.com');
 
 insert into Progreso (id_perfil, peso, nivel_actividad_fisica, fecha) values (1, 120, 'Sedentario', '2023-5-1');
 insert into Progreso (id_perfil, peso, nivel_actividad_fisica, fecha) values (1, 90, 'Moderadamente activo', '2023-10-1');
