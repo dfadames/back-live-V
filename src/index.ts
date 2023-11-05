@@ -62,8 +62,21 @@ app.post('/login', (req: Request, res: Response) => {
     }
   });
 });
+//
+app.post('/register', (req: Request, res: Response) => {
+  const { username, password, email } = req.body;
 
+  const sql = 'INSERT INTO usuario (nombre_usuario, contrasena, correo) VALUES (?, ?, ?)';
 
+  db.query(sql, [username, password, email], (err: any, result: any) => {
+    if (err) {
+      console.error('Error en la consulta SQL: ' + err);
+      res.status(500).send('Error interno del servidor');
+    } else {
+      res.status(200).send('Registro exitoso');
+    }
+  });
+});
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
