@@ -55,7 +55,7 @@ create table Perfil (id_perfil int key,
                                 else null
                             end
                         ),
-                        foreign key (id_perfil) references LifeV.Usuario (id_perfil));
+                        foreign key (id_perfil) references Usuario (id_perfil));
 
 drop table if exists Progreso;
 create table Progreso (id_progreso int auto_increment key not null,
@@ -67,7 +67,7 @@ create table Progreso (id_progreso int auto_increment key not null,
                         nivel_actividad_fisica varchar(100),
                         metabolismo_basal float,
                         fecha datetime,
-						foreign key (id_perfil) references LifeV.Perfil (id_perfil));
+						foreign key (id_perfil) references Perfil (id_perfil));
 
 drop table if exists Objetivo;
 create table Objetivo (id_objetivo int auto_increment key not null,
@@ -104,112 +104,112 @@ create table Registro_comida (id_registro_comida int auto_increment key not null
 						id_perfil int,
                         id_plato int,
                         fecha date,
-						foreign key (id_perfil) references LifeV.Perfil (id_perfil),
-                        foreign key (id_plato) references LifeV.Plato (id_plato));
+						foreign key (id_perfil) references Perfil (id_perfil),
+                        foreign key (id_plato) references Plato (id_plato));
 
 drop table if exists Perfil_tiene_Objetivo;
 create table Perfil_tiene_Objetivo (
 						id_perfil int,
                         id_objetivo int,
-                        foreign key (id_perfil) references LifeV.Perfil (id_perfil),
-                        foreign key (id_objetivo) references LifeV.Objetivo (id_objetivo));
+                        foreign key (id_perfil) references Perfil (id_perfil),
+                        foreign key (id_objetivo) references Objetivo (id_objetivo));
 
 drop table if exists Perfil_sigue_Dieta;
 create table Perfil_sigue_Dieta (
 						id_perfil int,
                         id_dieta int,
-                        foreign key (id_perfil) references LifeV.Perfil (id_perfil),
-                        foreign key (id_dieta) references LifeV.Dieta (id_dieta));
+                        foreign key (id_perfil) references Perfil (id_perfil),
+                        foreign key (id_dieta) references Dieta (id_dieta));
 
 drop table if exists Objetivo_tiene_Dieta;
 create table Objetivo_tiene_Dieta (
 						id_objetivo int,
                         id_dieta int,
-                        foreign key (id_objetivo) references LifeV.Objetivo (id_objetivo),
-                        foreign key (id_dieta) references LifeV.Dieta (id_dieta));
+                        foreign key (id_objetivo) references Objetivo (id_objetivo),
+                        foreign key (id_dieta) references Dieta (id_dieta));
 
 drop table if exists Plato_pertenece_Dieta;
 create table Plato_pertenece_Dieta (
 						id_plato int,
                         id_dieta int,
-                        foreign key (id_plato) references LifeV.Plato (id_plato),
-                        foreign key (id_dieta) references LifeV.Dieta (id_dieta));
+                        foreign key (id_plato) references Plato (id_plato),
+                        foreign key (id_dieta) references Dieta (id_dieta));
 
 drop table if exists Plato_favorito_Perfil;
 create table Plato_favorito_Perfil (
 						id_perfil int,
                         id_plato int,
-                        foreign key (id_perfil) references LifeV.Perfil (id_perfil),
-                        foreign key (id_plato) references LifeV.Plato (id_plato));
+                        foreign key (id_perfil) references Perfil (id_perfil),
+                        foreign key (id_plato) references Plato (id_plato));
 
 drop table if exists Comida_pertenece_Plato;
 create table Comida_pertenece_Plato (
 						id_plato int,
                         id_comida int,
-                        foreign key (id_plato) references LifeV.Plato (id_plato),
-                        foreign key (id_comida) references LifeV.Comida (id_comida));
+                        foreign key (id_plato) references Plato (id_plato),
+                        foreign key (id_comida) references Comida (id_comida));
 
 -- -------- --
 -- TRIGGERS --
 -- -------- --
 
-DELIMITER //
-CREATE TRIGGER Calculos_progreso
-BEFORE INSERT ON Progreso FOR EACH ROW
-BEGIN
+-- DELIMITER //
+-- CREATE TRIGGER Calculos_progreso
+-- BEFORE INSERT ON Progreso FOR EACH ROW
+-- BEGIN
 
-    SET NEW.imc = NEW.peso / (SELECT Perfil.altura * Perfil.altura FROM Perfil WHERE Perfil.id_perfil = NEW.id_perfil);
+--     SET NEW.imc = NEW.peso / (SELECT Perfil.altura * Perfil.altura FROM Perfil WHERE Perfil.id_perfil = NEW.id_perfil);
 
-    SET NEW.pgc = (
-        CASE
-            WHEN (SELECT Perfil.genero FROM Perfil WHERE Perfil.id_perfil = NEW.id_perfil) = 'Masculino' THEN
-                (1.20 * NEW.imc) + (0.23 * (SELECT Perfil.edad FROM Perfil WHERE Perfil.id_perfil = NEW.id_perfil)) - (10.8 * 1) - 5.4
-            WHEN (SELECT Perfil.genero FROM Perfil WHERE Perfil.id_perfil = NEW.id_perfil) = 'Femenino' THEN
-                (1.20 * NEW.imc) + (0.23 * (SELECT Perfil.edad FROM Perfil WHERE Perfil.id_perfil = NEW.id_perfil)) - (10.8 * 2) - 5.4
-            ELSE NULL
-        END
-    );
+--     SET NEW.pgc = (
+--         CASE
+--             WHEN (SELECT Perfil.genero FROM Perfil WHERE Perfil.id_perfil = NEW.id_perfil) = 'Masculino' THEN
+--                 (1.20 * NEW.imc) + (0.23 * (SELECT Perfil.edad FROM Perfil WHERE Perfil.id_perfil = NEW.id_perfil)) - (10.8 * 1) - 5.4
+--             WHEN (SELECT Perfil.genero FROM Perfil WHERE Perfil.id_perfil = NEW.id_perfil) = 'Femenino' THEN
+--                 (1.20 * NEW.imc) + (0.23 * (SELECT Perfil.edad FROM Perfil WHERE Perfil.id_perfil = NEW.id_perfil)) - (10.8 * 2) - 5.4
+--             ELSE NULL
+--         END
+--     );
 
-    SET NEW.porcentaje_masa_magra = 100 - NEW.pgc;
+--     SET NEW.porcentaje_masa_magra = 100 - NEW.pgc;
 
-    SET NEW.metabolismo_basal = (
-        CASE
-            WHEN (SELECT Perfil.genero FROM Perfil WHERE Perfil.id_perfil = NEW.id_perfil) = 'Masculino' THEN
-                (
-                    (66.5 + (13.7 * NEW.peso) + (5 * (SELECT Perfil.altura FROM Perfil WHERE Perfil.id_perfil = NEW.id_perfil) * 100) - (6.8 * (SELECT Perfil.edad FROM Perfil WHERE Perfil.id_perfil = NEW.id_perfil)))
-                    *
-                    (
-                        CASE
-                            WHEN NEW.nivel_actividad_fisica = 'Sedentario' THEN 1.2
-                            WHEN NEW.nivel_actividad_fisica = 'Poco activo' THEN 1.375
-                            WHEN NEW.nivel_actividad_fisica = 'Moderadamente activo' THEN 1.55
-                            WHEN NEW.nivel_actividad_fisica = 'Activo' THEN 1.725
-                            WHEN NEW.nivel_actividad_fisica = 'Muy activo' THEN 1.9
-                            ELSE NULL
-                        END
-                    )
-                )
-            WHEN (SELECT Perfil.genero FROM Perfil WHERE Perfil.id_perfil = NEW.id_perfil) = 'Femenino' THEN
-                (
-                    (665 + (9.6 * NEW.peso) + (1.8 * (SELECT Perfil.altura FROM Perfil WHERE Perfil.id_perfil = NEW.id_perfil) * 100) - (4.7 * (SELECT Perfil.edad FROM Perfil WHERE Perfil.id_perfil = NEW.id_perfil)))
-                    *
-                    (
-                        CASE
-                            WHEN NEW.nivel_actividad_fisica = 'Sedentario' THEN 1.2
-                            WHEN NEW.nivel_actividad_fisica = 'Poco activo' THEN 1.375
-                            WHEN NEW.nivel_actividad_fisica = 'Moderadamente activo' THEN 1.55
-                            WHEN NEW.nivel_actividad_fisica = 'Activo' THEN 1.725
-                            WHEN NEW.nivel_actividad_fisica = 'Muy activo' THEN 1.9
-                            ELSE NULL
-                        END
-                    )
-                )
-            ELSE NULL
-        END
-    );
-END;
-//
-DELIMITER ;
+--     SET NEW.metabolismo_basal = (
+--         CASE
+--             WHEN (SELECT Perfil.genero FROM Perfil WHERE Perfil.id_perfil = NEW.id_perfil) = 'Masculino' THEN
+--                 (
+--                     (66.5 + (13.7 * NEW.peso) + (5 * (SELECT Perfil.altura FROM Perfil WHERE Perfil.id_perfil = NEW.id_perfil) * 100) - (6.8 * (SELECT Perfil.edad FROM Perfil WHERE Perfil.id_perfil = NEW.id_perfil)))
+--                     *
+--                     (
+--                         CASE
+--                             WHEN NEW.nivel_actividad_fisica = 'Sedentario' THEN 1.2
+--                             WHEN NEW.nivel_actividad_fisica = 'Poco activo' THEN 1.375
+--                             WHEN NEW.nivel_actividad_fisica = 'Moderadamente activo' THEN 1.55
+--                             WHEN NEW.nivel_actividad_fisica = 'Activo' THEN 1.725
+--                             WHEN NEW.nivel_actividad_fisica = 'Muy activo' THEN 1.9
+--                             ELSE NULL
+--                         END
+--                     )
+--                 )
+--             WHEN (SELECT Perfil.genero FROM Perfil WHERE Perfil.id_perfil = NEW.id_perfil) = 'Femenino' THEN
+--                 (
+--                     (665 + (9.6 * NEW.peso) + (1.8 * (SELECT Perfil.altura FROM Perfil WHERE Perfil.id_perfil = NEW.id_perfil) * 100) - (4.7 * (SELECT Perfil.edad FROM Perfil WHERE Perfil.id_perfil = NEW.id_perfil)))
+--                     *
+--                     (
+--                         CASE
+--                             WHEN NEW.nivel_actividad_fisica = 'Sedentario' THEN 1.2
+--                             WHEN NEW.nivel_actividad_fisica = 'Poco activo' THEN 1.375
+--                             WHEN NEW.nivel_actividad_fisica = 'Moderadamente activo' THEN 1.55
+--                             WHEN NEW.nivel_actividad_fisica = 'Activo' THEN 1.725
+--                             WHEN NEW.nivel_actividad_fisica = 'Muy activo' THEN 1.9
+--                             ELSE NULL
+--                         END
+--                     )
+--                 )
+--             ELSE NULL
+--         END
+--     );
+-- END;
+-- //
+-- DELIMITER ;
 
 -- ------- --
 -- INSERTS --
@@ -221,10 +221,10 @@ insert into Usuario (nombre_usuario, contrasena, correo) values ('pepitap', '123
 insert into Perfil (id_perfil, nombre, edad, genero, altura, peso, alergias, nivel_actividad_fisica) values (1, 'Brandolfo Steven', 20, 'Masculino', 1.70, 90, 'Nueces', 'Moderadamente Activo');
 insert into Perfil (id_perfil, nombre, edad, genero, altura, peso, alergias, nivel_actividad_fisica) values (2, 'Pepita Pérez', 20, 'Femenino', 1.70, 55, null, 'Activo');
 
-insert into Progreso (id_perfil, peso, nivel_actividad_fisica, fecha) values (1, 120, 'Sedentario', '2023-5-1');
-insert into Progreso (id_perfil, peso, nivel_actividad_fisica, fecha) values (1, 90, 'Moderadamente activo', '2023-10-1');
-insert into Progreso (id_perfil, peso, nivel_actividad_fisica, fecha) values (2, 45, 'Muy activo', '2023-5-28');
-insert into Progreso (id_perfil, peso, nivel_actividad_fisica, fecha) values (2, 55, 'Activo', '2023-10-28');
+insert into Progreso (id_perfil, peso, imc, pgc, porcentaje_masa_magra, nivel_actividad_fisica, metabolismo_basal, fecha) values (1, 120, 41.5225, 38.227, 61.773, 'Sedentario', 2909.4, '2023-5-1');
+insert into Progreso (id_perfil, peso, imc, pgc, porcentaje_masa_magra, nivel_actividad_fisica, metabolismo_basal, fecha) values (1, 90, 31.1419, 25.7702, 74.2298, 'Moderadamente activo', 3120.93, '2023-10-1');
+insert into Progreso (id_perfil, peso, imc, pgc, porcentaje_masa_magra, nivel_actividad_fisica, metabolismo_basal, fecha) values (2, 45, 15.5709, -3.71488, 103.715, 'Muy activo', 2487.1, '2023-5-28');
+insert into Progreso (id_perfil, peso, imc, pgc, porcentaje_masa_magra, nivel_actividad_fisica, metabolismo_basal, fecha) values (2, 55, 19.0311, 0.43737, 99.5626, 'Activo', 2423.62, '2023-10-28');
 
 insert into Objetivo (nombre_objetivo, descripcion_objetivo) values ('Bajar de peso', 'Actualmente el usuario tiene obesidad grado 3 pero se propuso llegar a la meta de 80kg en 1 año');
 insert into Objetivo (nombre_objetivo, descripcion_objetivo) values ('Subir de peso', 'Actualmente el usuario tiene bajo peso pero se propuso llegar a la meta de 60kg en 6 meses');
@@ -242,8 +242,8 @@ insert into Comida (nombre_comida, descripcion_comida, calorias, carbohidratos, 
 insert into Registro_comida (id_perfil, id_plato, fecha) values (1, 1, '2023-10-31');
 insert into Registro_comida (id_perfil, id_plato, fecha) values (2, 2, '2023-10-31');
 
-insert into Perfil_tiene_objetivo (id_perfil, id_objetivo) values (1, 1);
-insert into Perfil_tiene_objetivo (id_perfil, id_objetivo) values (2, 2);
+insert into Perfil_tiene_Objetivo (id_perfil, id_objetivo) values (1, 1);
+insert into Perfil_tiene_Objetivo (id_perfil, id_objetivo) values (2, 2);
 
 insert into Perfil_sigue_Dieta (id_perfil, id_dieta) values (1, 1);
 insert into Perfil_sigue_Dieta (id_perfil, id_dieta) values (2, 2);
