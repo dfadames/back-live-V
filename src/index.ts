@@ -41,7 +41,7 @@ app.post('/login', (req: Request, res: Response) => {
   // como se reecibe la informacion y para que sirve
   const { username, password } = req.body;
   // consulta 
-  const sql = 'SELECT * FROM usuario WHERE nombre_usuario = ? AND contrasena = ?';
+  const sql = 'SELECT * FROM Usuario WHERE nombre_usuario = ? AND contrasena = ?';
 
   //una query a la base de datos quee verifique la informacion de login
   db.query(sql, [username, password], (err: Error| null, results: any) => {
@@ -66,7 +66,7 @@ app.post('/login', (req: Request, res: Response) => {
 app.post('/register', (req: Request, res: Response) => {
   const { username, password, email } = req.body;
 
-  const sql = 'INSERT INTO usuario (nombre_usuario, contrasena, correo) VALUES (?, ?, ?)';
+  const sql = 'INSERT INTO Usuario (nombre_usuario, contrasena, correo) VALUES (?, ?, ?)';
 
   db.query(sql, [username, password, email], (err: any, result: any) => {
     if (err) {
