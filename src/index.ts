@@ -75,6 +75,7 @@ app.post('/register', (req: Request, res: Response) => {
       console.error('Error en la consulta SQL: ' + err);
       res.status(500).send('Error interno del servidor');
     } else {
+      console.error('usuario creado: ' + username);
       res.status(200).send('Registro exitoso');
     }
   });
