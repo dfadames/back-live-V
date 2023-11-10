@@ -55,10 +55,11 @@ app.post('/login', (req: Request, res: Response) => {
       if (results.length === 1) {
         const user = { username: username };
         const token = jwt.sign(user, secretKey);
-
+        console.log("intento de loging exitoso con "+username);
         // Devuelve el token JWT como respuesta
         res.status(200).json({ token });
       } else {
+        console.log("intento de loging fallido con"+username+password);
         res.status(401).send('Credenciales incorrectas');
       }
     }
@@ -81,6 +82,19 @@ app.post('/register', (req: Request, res: Response) => {
   });
 });
 
+app.get('/usuarios', (req, res) => {
+  const query = 'SELECT * FROM Usuario';
+
+  connection.query(query, (error, results) => {
+    if (error) {
+      console.error('Error al realizar la consulta:', error);
+      res.status(500).send('Error interno del servidor');
+      return;
+    }
+
+    res.json(results);
+  });
+});
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
