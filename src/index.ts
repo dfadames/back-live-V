@@ -9,6 +9,8 @@ const mysql = require('mysql');
 const bodyParser = require('body-parser');
 const dbConfig = require('./dbConfig');
 const jwt = require('jsonwebtoken'); // Importa la biblioteca jsonwebtoken
+const cors = require('cors');
+app.use(cors());
 
 const PORT = 3000;
 const secretKey = '1234'; // Clave secreta para firmar el token JWT
