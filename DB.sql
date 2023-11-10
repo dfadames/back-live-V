@@ -7,18 +7,18 @@ use LifeV;
 -- ------ --
 
 drop table if exists Usuario;
-create table Usuario (id_perfil int auto_increment key not null,
-						nombre_usuario varchar(100), 
-						contrasena varchar(100),
-						correo varchar(100));
+create table Usuario (id_perfil int auto_increment key not null unique,
+						nombre_usuario varchar(100) unique not null, 
+						contrasena varchar(100) not null,
+						correo varchar(100) unique not null);
 
 drop table if exists Perfil;
-create table Perfil (id_perfil int key, 
-						nombre varchar(100), 
-                        edad int, 
-                        genero varchar(100), 
-                        altura float,
-                        peso  float,
+create table Perfil (id_perfil int key not null unique, 
+						nombre varchar(100) not null, 
+                        edad int not null, 
+                        genero varchar(100) not null, 
+                        altura float not null,
+                        peso  float not null,
                         alergias varchar(100),
                         imc float as (peso / (altura * altura)), -- se puede incluir una tabla para clasificar
                         pgc float as (
@@ -29,7 +29,7 @@ create table Perfil (id_perfil int key,
 							end
 						),
                         porcentaje_masa_magra float as (100-pgc),
-                        nivel_actividad_fisica varchar(100), -- se puede incluir una tabla para clasificar
+                        nivel_actividad_fisica varchar(100) not null, -- se puede incluir una tabla para clasificar
                         metabolismo_basal float as (
 							case
 								when genero = 'Masculino' and nivel_actividad_fisica = 'Sedentario' then 
@@ -58,94 +58,94 @@ create table Perfil (id_perfil int key,
                         foreign key (id_perfil) references Usuario (id_perfil));
 
 drop table if exists Progreso;
-create table Progreso (id_progreso int auto_increment key not null,
-						id_perfil int,
-                        peso  float,
-                        imc float,
-                        pgc float,
-                        porcentaje_masa_magra float,
-                        nivel_actividad_fisica varchar(100),
-                        metabolismo_basal float,
-                        fecha datetime,
+create table Progreso (id_progreso int auto_increment key not null unique,
+						id_perfil int not null,
+                        peso  float not null,
+                        imc float not null,
+                        pgc float not null,
+                        porcentaje_masa_magra float not null,
+                        nivel_actividad_fisica varchar(100) not null,
+                        metabolismo_basal float not null,
+                        fecha datetime not null,
 						foreign key (id_perfil) references Perfil (id_perfil));
 
 drop table if exists Objetivo;
-create table Objetivo (id_objetivo int auto_increment key not null,
-						nombre_objetivo varchar(100),
-                        descripcion_objetivo varchar(100));
+create table Objetivo (id_objetivo int auto_increment key not null unique,
+						nombre_objetivo varchar(100) not null unique,
+                        descripcion_objetivo varchar(100) not null);
                         
 drop table if exists Dieta;
-create table Dieta (id_dieta int auto_increment key not null,
-						nombre_dieta varchar(100),
-                        descripcion_dieta varchar(100));
+create table Dieta (id_dieta int auto_increment key not null unique,
+						nombre_dieta varchar(100) not null unique,
+                        descripcion_dieta varchar(100) not null);
 
 drop table if exists Plato;
-create table Plato (id_plato int auto_increment key not null,
-                        nombre_plato varchar(100),
-                        descripcion_plato varchar(100),
-                        calorias float,
-                        carbohidratos float,
-                        proteinas float,
-                        grasas float,
-                        tipo varchar(100));
+create table Plato (id_plato int auto_increment key not null unique,
+                        nombre_plato varchar(100) not null,
+                        descripcion_plato varchar(100) not null,
+                        calorias float not null,
+                        carbohidratos float not null,
+                        proteinas float not null,
+                        grasas float not null,
+                        tipo varchar(100) not null);
 
 drop table if exists Comida;
-create table Comida (id_comida int auto_increment key not null,
-						nombre_comida varchar(100),
-                        descripcion_comida varchar(100),
-                        calorias float,
-                        carbohidratos float,
-                        proteinas float,
-                        grasas float,
-                        tipo varchar(100));
+create table Comida (id_comida int auto_increment key not null unique,
+						nombre_comida varchar(100) not null,
+                        descripcion_comida varchar(100) not null,
+                        calorias float not null,
+                        carbohidratos float not null,
+                        proteinas float not null,
+                        grasas float not null,
+                        tipo varchar(100) not null);
 
 drop table if exists Registro_comida;
-create table Registro_comida (id_registro_comida int auto_increment key not null,
-						id_perfil int,
-                        id_plato int,
-                        fecha date,
+create table Registro_comida (id_registro_comida int auto_increment key not null unique,
+						id_perfil int not null,
+                        id_plato int not null,
+                        fecha date not null,
 						foreign key (id_perfil) references Perfil (id_perfil),
                         foreign key (id_plato) references Plato (id_plato));
 
 drop table if exists Perfil_tiene_Objetivo;
 create table Perfil_tiene_Objetivo (
-						id_perfil int,
-                        id_objetivo int,
+						id_perfil int not null unique,
+                        id_objetivo int not null,
                         foreign key (id_perfil) references Perfil (id_perfil),
                         foreign key (id_objetivo) references Objetivo (id_objetivo));
 
 drop table if exists Perfil_sigue_Dieta;
 create table Perfil_sigue_Dieta (
-						id_perfil int,
-                        id_dieta int,
+						id_perfil int not null unique,
+                        id_dieta int not null,
                         foreign key (id_perfil) references Perfil (id_perfil),
                         foreign key (id_dieta) references Dieta (id_dieta));
 
 drop table if exists Objetivo_tiene_Dieta;
 create table Objetivo_tiene_Dieta (
-						id_objetivo int,
-                        id_dieta int,
+						id_objetivo int not null,
+                        id_dieta int not null,
                         foreign key (id_objetivo) references Objetivo (id_objetivo),
                         foreign key (id_dieta) references Dieta (id_dieta));
 
 drop table if exists Plato_pertenece_Dieta;
 create table Plato_pertenece_Dieta (
-						id_plato int,
-                        id_dieta int,
+						id_plato int not null,
+                        id_dieta int not null,
                         foreign key (id_plato) references Plato (id_plato),
                         foreign key (id_dieta) references Dieta (id_dieta));
 
 drop table if exists Plato_favorito_Perfil;
 create table Plato_favorito_Perfil (
-						id_perfil int,
-                        id_plato int,
+						id_perfil int not null,
+                        id_plato int not null,
                         foreign key (id_perfil) references Perfil (id_perfil),
                         foreign key (id_plato) references Plato (id_plato));
 
 drop table if exists Comida_pertenece_Plato;
 create table Comida_pertenece_Plato (
-						id_plato int,
-                        id_comida int,
+						id_plato int not null,
+                        id_comida int not null,
                         foreign key (id_plato) references Plato (id_plato),
                         foreign key (id_comida) references Comida (id_comida));
 
