@@ -82,10 +82,10 @@ app.post('/register', (req: Request, res: Response) => {
   });
 });
 
-app.get('/usuarios', (req, res) => {
+app.get('/usuarios', (req: any, res: any) => {
   const query = 'SELECT * FROM Usuario';
 
-  connection.query(query, (error, results) => {
+  db.query(query, (error: any, results: any) => {
     if (error) {
       console.error('Error al realizar la consulta:', error);
       res.status(500).send('Error interno del servidor');
