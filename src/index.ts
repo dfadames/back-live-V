@@ -65,16 +65,58 @@ app.post('/login', (req: Request, res: Response) => {
     }
   });
 });
+
+function authenticateToken(req: any, res: any, next: any) {
+  const token = req.headers.authorization;
+
+  if (!token) {
+    return res.status(401).send('Token no proporcionado');
+  }
+
+  jwt.verify(token, secretKey, (err: any, user: any) => {
+    if (err) {
+      return res.status(403).send('Token no válido');
+    }
+    req.user = user; // Almacena el usuario en el objeto de solicitud
+
+    // Realiza una consulta SQL para obtener la id del usuario
+    const username = user.username;
+    const getUserIdSql = 'SELECT id_perfil FROM Usuario WHERE nombre_usuario = ?';
+    
+    db.query(getUserIdSql, [username], (err: any, results: any) => {
+      if (err) {
+        console.error('Error en la consulta SQL: ' + err);
+        return res.status(500).send('Error interno del servidor');
+      }
+
+      if (results.length !== 1) {
+        return res.status(404).send('Usuario no encontrado');
+      }
+
+      req.user.id = results[0].id_perfil; // Agrega la id del usuario a req.user
+      next();
+    });
+  });
+}
+
+
 //register 
 app.post('/register', (req: Request, res: Response) => {
   const { username, password, email } = req.body;
 
   const sql = 'INSERT INTO Usuario (nombre_usuario, contrasena, correo) VALUES (?, ?, ?)';
 
-  db.query(sql, [username, password, email], (err: any, result: any) => {
+  db.query(sql, [username, password, email], (err: any) => {
     if (err) {
+      let duplicate: string  = "" + err; 
+      if (duplicate.includes('Duplicate')){
+        console.error('Error en la consulta SQL: ' + err);
+        res.status(500).send('Este usuario ya existe');
+      }
+      else{
       console.error('Error en la consulta SQL: ' + err);
       res.status(500).send('Error interno del servidor');
+      }
     } else {
       console.error('usuario creado: ' + username);
       res.status(200).send('Registro exitoso');
@@ -95,6 +137,29 @@ app.get('/usuarios', (req: any, res: any) => {
     res.json(results);
   });
 });
+
+
+
+app.get('/perfil', authenticateToken, (req: any, res: any) => {
+  // Acceso permitido solo si el token es válido
+  // El usuario autenticado está disponible en req.user
+
+  const userId = req.user.id;
+
+  // Realiza una consulta SQL para obtener la información del perfil del usuario
+  const sql = 'SELECT * FROM Perfil WHERE id_perfil = ?';
+
+  db.query(sql, [userId], (err: any, results: any) => {
+    if (err) {
+      console.error('Error en la consulta SQL: ' + err);
+      return res.status(500).send('Error interno del servidor');
+    }
+    console.log('informacion devuelta'+userId);
+    // Devuelve la información del perfil del usuario
+    res.json(results);
+  });
+});
+
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
