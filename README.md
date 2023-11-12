@@ -15,7 +15,16 @@ Está desarrollado utilizando principalmente las siguientes tecnologías:
 - Node.js: Un entorno de tiempo de ejecución de JavaScript que permite ejecutar código en el servidor.
 - TypeScript: Un superconjunto de JavaScript que agrega tipado estático para una mejor seguridad y mantenibilidad del código.
 - Express: Un framework de Node.js que simplifica la creación de API REST y la gestión de rutas.
-- Docker: Una plataforma de contenedores que facilita la implementación y gestión de aplicaciones en entornos aislados.
+- MySQL: Un sistema de gestión de bases de datos relacional para almacenar y recuperar datos de manera eficiente.
+
+Herramientas de Deploy:
+
+- Clever Cloud: Plataforma de hosting que proporciona soluciones para despliegue, escalado y gestión de aplicaciones en la nube.
+
+  - Soporte para MySQL en Clever Cloud: Proporciona servicios de base de datos MySQL en la nube para la aplicación.
+
+- Render: Plataforma de alojamiento que facilita el despliegue y la gestión de aplicaciones web y backend.
+  - Backend Render: Servicio de Render para alojar y escalar el backend de Node.js con facilidad.
 
 ## Instrucciones de Instalación
 
@@ -69,4 +78,4 @@ Finalmente, pueden iniciar la aplicación. Ya que se ha configurado el proyecto 
 npm run dev
 ```
 
-Este comando iniciará el servidor de desarrollo y cade vez que se modifique y guarde reiniciará de manera automática el servidor con los cambios realizados para testeo inmediato.
+Este comando inicializará el servidor y cada vez que se realice modificaciones en el código y se guarde, el servidor se reiniciará de automáticamente con los cambios para probarlos inmediatamente.
