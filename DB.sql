@@ -23,8 +23,8 @@ create table Perfil (id_perfil int key not null unique,
                         imc float as (peso / (altura * altura)), -- se puede incluir una tabla para clasificar
                         pgc float as (
 							case
-								when genero = 'Masculino' then (1.20*imc)+(0.23*edad)-(10.8*1)-5.4
-								when genero = 'Femenino' then (1.20*imc)+(0.23*edad)-(10.8*2)-5.4
+								when genero = 'Masculino' then (1.20*imc)+(0.23*edad)-16.2
+								when genero = 'Femenino' then (1.20*imc)+(0.23*edad)-5.4
 								else null
 							end
 						),
@@ -223,8 +223,8 @@ insert into Perfil (id_perfil, nombre, edad, genero, altura, peso, alergias, niv
 
 insert into Progreso (id_perfil, peso, imc, pgc, porcentaje_masa_magra, nivel_actividad_fisica, metabolismo_basal, fecha) values (1, 120, 41.5225, 38.227, 61.773, 'Sedentario', 2909.4, '2023-5-1');
 insert into Progreso (id_perfil, peso, imc, pgc, porcentaje_masa_magra, nivel_actividad_fisica, metabolismo_basal, fecha) values (1, 90, 31.1419, 25.7702, 74.2298, 'Moderadamente activo', 3120.93, '2023-10-1');
-insert into Progreso (id_perfil, peso, imc, pgc, porcentaje_masa_magra, nivel_actividad_fisica, metabolismo_basal, fecha) values (2, 45, 15.5709, -3.71488, 103.715, 'Muy activo', 2487.1, '2023-5-28');
-insert into Progreso (id_perfil, peso, imc, pgc, porcentaje_masa_magra, nivel_actividad_fisica, metabolismo_basal, fecha) values (2, 55, 19.0311, 0.43737, 99.5626, 'Activo', 2423.62, '2023-10-28');
+insert into Progreso (id_perfil, peso, imc, pgc, porcentaje_masa_magra, nivel_actividad_fisica, metabolismo_basal, fecha) values (2, 45, 15.5709, 17.8851, 82.1149, 'Muy activo', 2487.1, '2023-5-28');
+insert into Progreso (id_perfil, peso, imc, pgc, porcentaje_masa_magra, nivel_actividad_fisica, metabolismo_basal, fecha) values (2, 55, 19.0311, 22.0374, 77.9626, 'Activo', 2423.62, '2023-10-28');
 
 insert into Objetivo (nombre_objetivo, descripcion_objetivo) values ('Bajar de peso', 'Actualmente el usuario tiene obesidad grado 3 pero se propuso llegar a la meta de 80kg en 1 año');
 insert into Objetivo (nombre_objetivo, descripcion_objetivo) values ('Subir de peso', 'Actualmente el usuario tiene bajo peso pero se propuso llegar a la meta de 60kg en 6 meses');
