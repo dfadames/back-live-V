@@ -5,7 +5,7 @@ export const getProfileInfo = (req: any, res: any) => {
 
   getProfileInfoById(userId, (err: any, results: any) => {
     if (err) {
-      return res.status(500).send("Error interno del servidor");
+      return res.status(500).json({ error: "Error interno del servidor" });
     }
     res.json(results);
   });

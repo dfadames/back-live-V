@@ -23,7 +23,7 @@ const PORT = 3000;
 
 //importamos el direccionamiento de rutas:
 import { login, register } from "./controllers/authController";
-import { ping, getUsuarios } from "./controllers/others";
+import { ping, getUsuarios } from "./controllers/othersController";
 import { getProfileInfo } from "./controllers/profileController";
 import {
   getRecipes,

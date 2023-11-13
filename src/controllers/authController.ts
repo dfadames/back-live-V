@@ -18,7 +18,7 @@ export const login = (req: Request, res: Response) => {
   db.query(sql, [username, password], (err: Error | null, results: any) => {
     if (err) {
       console.error("Error en la consulta SQL: " + err);
-      res.status(500).send("Error interno del servidor");
+      res.status(500).json({ error: "Error interno del servidor" });
     } else {
       //si devuelve solo la consulta (1 parametro) la consulta eesta bien
       if (results.length === 1) {
@@ -29,11 +29,12 @@ export const login = (req: Request, res: Response) => {
         res.status(200).json({ token });
       } else {
         console.log("intento de loging fallido con" + username + password);
-        res.status(401).send("Credenciales incorrectas");
+        res.status(401).json({ error: "Credenciales incorrectas" });
       }
     }
   });
 };
+
 //se realiza una peticion para insertar datos en la base de datos
 export const register = (req: Request, res: Response) => {
   const { username, password, email } = req.body;
@@ -45,14 +46,16 @@ export const register = (req: Request, res: Response) => {
       let duplicate: string = "" + err;
       if (duplicate.includes("Duplicate")) {
         console.error("Error en la consulta SQL: " + err);
-        res.status(500).send("Este usuario y/o email ya esta registrado");
+        res
+          .status(400)
+          .json({ error: "Este usuario y/o email ya esta registrado" });
       } else {
         console.error("Error en la consulta SQL: " + err);
-        res.status(500).send("Error interno del servidor");
+        res.status(500).json({ error: "Error interno del servidor" });
       }
     } else {
       console.log("Usuario creado: " + username);
-      res.status(200).send("Registro exitoso");
+      res.status(200).json({ message: "Registro exitoso" });
     }
   });
 };
