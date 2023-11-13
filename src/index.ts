@@ -19,7 +19,7 @@ app.use(bodyParser.json());
 app.use(express.json());
 
 //puerto
-const PORT = 3000;
+const PORT = process.env.PORT;
 
 //importamos el direccionamiento de rutas:
 import { login, register } from "./controllers/authController";
