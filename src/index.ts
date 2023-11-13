@@ -22,14 +22,14 @@ app.use(express.json());
 const PORT = 3000;
 
 //importamos el direccionamiento de rutas:
-import { login, register } from "./routes/authRoutes";
-import { ping, usuarios } from "./routes/others";
-import { perfil } from "./routes/profileinfo";
+import { login, register } from "./controllers/authController";
+import { ping, getUsuarios } from "./controllers/others";
+import { getProfileInfo } from "./controllers/profileController";
 import {
   getRecipes,
   getNutritionAnalysis,
   searchFood,
-} from "./routes/edamamController";
+} from "./controllers/edamamController";
 import { authenticateToken } from "./token/authtoken";
 //configuramos las rutas con su debida funcion y metodo
 //rutas de autenticacion de credenciales
@@ -38,15 +38,15 @@ app.post("/register", register);
 
 //rutas de funcionalidades varias:
 app.get("/ping", ping);
-app.get("/usuarios", usuarios);
+app.get("/usuarios", getUsuarios);
 
 //rutas para el acceso de informacion del perfil
-app.get("/perfil", authenticateToken, perfil);
+app.get("/perfil", authenticateToken, getProfileInfo);
 
 //rutas para acceso a la api externa
-app.get("/api/recipes", getRecipes);
-app.post("/api/nutrition", getNutritionAnalysis);
-app.get("/api/food", searchFood);
+app.get("/api/recetas", getRecipes);
+app.post("/api/nutricion", getNutritionAnalysis);
+app.get("/api/comida", searchFood);
 
 //saca la base de datos
 app.listen(PORT, () => {
