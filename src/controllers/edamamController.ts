@@ -6,10 +6,10 @@ import {
   searchFoodDatabase,
 } from "../extra/edamamService";
 
-export function getRecipes(req: Request, res: Response) {
-  const query = req.query.q as string;
+export function getRecipes(req: any, res: any) {
+  const profileInfo = req.profileInfo;
 
-  searchRecipes(query)
+  searchRecipes(profileInfo)
     .then((recipes) => res.json(recipes))
     .catch((error) => {
       console.error(error);
@@ -17,7 +17,7 @@ export function getRecipes(req: Request, res: Response) {
     });
 }
 
-export function getNutritionAnalysis(req: Request, res: Response) {
+export function getNutritionAnalysis(req: any, res: any) {
   const ingredients = req.body.ingredients as string[];
 
   analyzeNutrition(ingredients)
@@ -28,7 +28,7 @@ export function getNutritionAnalysis(req: Request, res: Response) {
     });
 }
 
-export function searchFood(req: Request, res: Response) {
+export function searchFood(req: any, res: any) {
   const query = req.query.q as string;
 
   searchFoodDatabase(query)

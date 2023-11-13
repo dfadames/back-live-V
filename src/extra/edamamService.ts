@@ -22,11 +22,11 @@ if (
   );
 }
 
-export function searchRecipes(query: string) {
+export function searchRecipes(profileInfo: any) {
+  const edamamApiUrl = `https://api.edamam.com/api/recipes/v2?type=public&app_id=${RECIPE_APP_ID}&app_key=${RECIPE_APP_KEY}&excluded=${profileInfo.alergias}`;
+
   return axios
-    .get(
-      `https://api.edamam.com/api/recipes/v2?q=${query}&app_id=${RECIPE_APP_ID}&app_key=${RECIPE_APP_KEY}&type=public`
-    )
+    .get(edamamApiUrl)
     .then((response) => response.data)
     .catch((error) => {
       throw error;

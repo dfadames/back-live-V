@@ -31,6 +31,7 @@ import {
   searchFood,
 } from "./controllers/edamamController";
 import { authenticateToken } from "./token/authtoken";
+const getProfileData = [authenticateToken, getProfileInfo];
 //configuramos las rutas con su debida funcion y metodo
 //rutas de autenticacion de credenciales
 app.post("/login", login);
@@ -41,10 +42,12 @@ app.get("/ping", ping);
 app.get("/usuarios", getUsuarios);
 
 //rutas para el acceso de informacion del perfil
-app.get("/perfil", authenticateToken, getProfileInfo);
+app.get("/perfil", getProfileData, (req: any, res: any) => {
+  res.json(req.profileInfo);
+});
 
 //rutas para acceso a la api externa
-app.get("/api/recetas", getRecipes);
+app.get("/api/recetas", getProfileData, getRecipes);
 app.post("/api/nutricion", getNutritionAnalysis);
 app.get("/api/comida", searchFood);
 
