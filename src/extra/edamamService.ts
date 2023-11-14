@@ -56,3 +56,14 @@ export function searchFoodDatabase(query: string) {
       throw error;
     });
 }
+
+export function search(query: string, calories: string) {
+  return axios
+    .get(
+      `https://api.edamam.com/api/recipes/v2?type=public&q=${query}&app_id=${RECIPE_APP_ID}&app_key=${RECIPE_APP_KEY}&calories=${calories}`
+    )
+    .then((response) => response.data)
+    .catch((error) => {
+      throw error;
+    });
+}

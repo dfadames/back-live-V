@@ -4,6 +4,7 @@ import {
   searchRecipes,
   analyzeNutrition,
   searchFoodDatabase,
+  search,
 } from "../extra/edamamService";
 
 export function getRecipes(req: any, res: any) {
@@ -33,6 +34,18 @@ export function searchFood(req: any, res: any) {
 
   searchFoodDatabase(query)
     .then((foodResults) => res.json(foodResults))
+    .catch((error) => {
+      console.error(error);
+      res.status(500).json({ error: "Internal Server Error" });
+    });
+}
+
+export function searchByNameAndCalories(req: any, res: any) {
+  const query = req.query.q as string;
+  const calories = req.query.calories as string;
+
+  search(query, calories)
+    .then((recipes) => res.json(recipes))
     .catch((error) => {
       console.error(error);
       res.status(500).json({ error: "Internal Server Error" });
