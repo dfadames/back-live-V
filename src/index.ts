@@ -30,6 +30,7 @@ import {
   getNutritionAnalysis,
   searchFood,
   searchByNameAndCalories,
+  searchByName,
 } from "./controllers/edamamController";
 import { authenticateToken } from "./token/authtoken";
 const getProfileData = [authenticateToken, getProfileInfo];
@@ -52,6 +53,7 @@ app.get("/api/recetas", getProfileData, getRecipes);
 app.post("/api/nutricion", getNutritionAnalysis);
 app.get("/api/comida", searchFood);
 app.get("/api/buscador", searchByNameAndCalories)
+app.get("/api/buscanombre", searchByName)
 
 //saca la base de datos
 app.listen(PORT, () => {

@@ -57,10 +57,23 @@ export function searchFoodDatabase(query: string) {
     });
 }
 
+// Busqueda en la api filtrando de acuerdo al nombre de la receta y un aproximado de calorias
 export function search(query: string, calories: string) {
   return axios
     .get(
       `https://api.edamam.com/api/recipes/v2?type=public&q=${query}&app_id=${RECIPE_APP_ID}&app_key=${RECIPE_APP_KEY}&calories=${calories}`
+    )
+    .then((response) => response.data)
+    .catch((error) => {
+      throw error;
+    });
+}
+
+// Busqueda en la api filtrando de acuerdo al nombre de la receta
+export function searchName(query: string) {
+  return axios
+    .get(
+      `https://api.edamam.com/api/recipes/v2?type=public&q=${query}&app_id=${RECIPE_APP_ID}&app_key=${RECIPE_APP_KEY}`
     )
     .then((response) => response.data)
     .catch((error) => {

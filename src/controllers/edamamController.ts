@@ -5,6 +5,7 @@ import {
   analyzeNutrition,
   searchFoodDatabase,
   search,
+  searchName,
 } from "../extra/edamamService";
 
 export function getRecipes(req: any, res: any) {
@@ -40,11 +41,24 @@ export function searchFood(req: any, res: any) {
     });
 }
 
+// Función que recibe los datos y llama a la función search que se conecta con la api
 export function searchByNameAndCalories(req: any, res: any) {
   const query = req.query.q as string;
   const calories = req.query.calories as string;
 
   search(query, calories)
+    .then((recipes) => res.json(recipes))
+    .catch((error) => {
+      console.error(error);
+      res.status(500).json({ error: "Internal Server Error" });
+    });
+}
+
+// Función que recibe los datos y llama a la función searchName que se conecta con la api
+export function searchByName(req: any, res: any) {
+  const query = req.query.q as string;
+
+  searchName(query)
     .then((recipes) => res.json(recipes))
     .catch((error) => {
       console.error(error);
