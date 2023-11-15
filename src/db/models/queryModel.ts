@@ -17,7 +17,7 @@ export const executeQuery = (
 
     //una query a la base de datos quee verifique la informacion de login
     connection.query(query, params, (error: Error, results: any) => {
-      connection.release(); // Release the connection back to the pool
+      connection.release(); // Liberar la conexión al pool
 
       if (error) {
         console.error("Error al realizar la consulta:", error);

@@ -15,7 +15,7 @@ export const login = (req: Request, res: Response) => {
   const query =
     "SELECT * FROM Usuario WHERE nombre_usuario = ? AND contrasena = ?";
 
-  // se crea una conexión
+  // se ejecuta el query creandose una conexión
   executeQuery(query, [username, password], (err: Error, results: any) => {
     if (err) {
       return res.status(500).json({ error: "Error interno del servidor" });

@@ -8,7 +8,11 @@ export const getProfileInfo = (req: any, res: any, next: any) => {
       return res.status(500).json({ error: "Error interno del servidor" });
     }
 
-    req.body.profileInfo = results;
-    next();
+    if (results.length > 0) {
+      req.body.profileInfo = results;
+      next();
+    } else {
+      res.status(404).json({ message: "Perfil no encontrado" });
+    }
   });
 };

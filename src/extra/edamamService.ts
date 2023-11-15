@@ -33,11 +33,11 @@ export function searchRecipes(profileInfo: any) {
     });
 }
 
-export function analyzeNutrition(ingredients: string[]) {
+export function analyzeNutrition(ingr: string[]) {
   return axios
     .post(
       "https://api.edamam.com/api/nutrition-details",
-      { ingredients },
+      { ingr },
       { params: { app_id: NUTRITION_APP_ID, app_key: NUTRITION_APP_KEY } }
     )
     .then((response) => response.data)
@@ -46,10 +46,10 @@ export function analyzeNutrition(ingredients: string[]) {
     });
 }
 
-export function searchFoodDatabase(query: string) {
+export function searchFoodDatabase(ingr: string) {
   return axios
     .get(
-      `https://api.edamam.com/api/food-database/v2/parser?q=${query}&app_id=${FOOD_APP_ID}&app_key=${FOOD_APP_KEY}`
+      `https://api.edamam.com/api/food-database/v2/parser?ingr=${ingr}&app_id=${FOOD_APP_ID}&app_key=${FOOD_APP_KEY}`
     )
     .then((response) => response.data)
     .catch((error) => {

@@ -20,9 +20,9 @@ export function getRecipes(req: Request, res: Response) {
 }
 
 export function getNutritionAnalysis(req: Request, res: Response) {
-  const ingredients = req.body.ingredients as string[];
+  const ingr = req.body.ingr as string[];
 
-  analyzeNutrition(ingredients)
+  analyzeNutrition(ingr)
     .then((nutritionAnalysis) => res.json(nutritionAnalysis))
     .catch((error) => {
       console.error(error);
@@ -31,9 +31,9 @@ export function getNutritionAnalysis(req: Request, res: Response) {
 }
 
 export function searchFood(req: Request, res: Response) {
-  const query = req.query.q as string;
+  const ingr = req.query.ingr as string;
 
-  searchFoodDatabase(query)
+  searchFoodDatabase(ingr)
     .then((foodResults) => res.json(foodResults))
     .catch((error) => {
       console.error(error);
