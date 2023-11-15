@@ -45,15 +45,15 @@ app.get("/usuarios", getUsuarios);
 
 //rutas para el acceso de informacion del perfil
 app.get("/perfil", getProfileData, (req: any, res: any) => {
-  res.json(req.profileInfo);
+  res.json(req.body.profileInfo);
 });
 
 //rutas para acceso a la api externa
 app.get("/api/recetas", getProfileData, getRecipes);
 app.post("/api/nutricion", getNutritionAnalysis);
 app.get("/api/comida", searchFood);
-app.get("/api/buscador", searchByNameAndCalories)
-app.get("/api/buscanombre", searchByName)
+app.get("/api/buscador", searchByNameAndCalories);
+app.get("/api/buscanombre", searchByName);
 
 //saca la base de datos
 app.listen(PORT, () => {
