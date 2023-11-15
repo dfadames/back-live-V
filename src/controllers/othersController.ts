@@ -1,4 +1,5 @@
 import db from "../db/dbConfig";
+import { executeQuery } from "../db/models/queryModel";
 
 // prueba de conexion con el servidor
 export const ping = (req: any, res: any) => {
@@ -10,13 +11,11 @@ export const ping = (req: any, res: any) => {
 export const getUsuarios = (req: any, res: any) => {
   const query = "SELECT * FROM Usuario";
 
-  db.query(query, (error: any, results: any) => {
+  executeQuery(query, [], (error: Error, results: any) => {
     if (error) {
-      console.error("Error al realizar la consulta:", error);
       res.status(500).send("Error interno del servidor");
-      return;
+    } else {
+      res.json(results);
     }
-
-    res.json(results);
   });
 };

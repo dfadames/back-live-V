@@ -6,8 +6,8 @@ import {
   searchFoodDatabase,
 } from "../extra/edamamService";
 
-export function getRecipes(req: any, res: any) {
-  const profileInfo = req.profileInfo;
+export function getRecipes(req: Request, res: Response) {
+  const profileInfo = req.body.profileInfo;
 
   searchRecipes(profileInfo)
     .then((recipes) => res.json(recipes))
@@ -17,7 +17,7 @@ export function getRecipes(req: any, res: any) {
     });
 }
 
-export function getNutritionAnalysis(req: any, res: any) {
+export function getNutritionAnalysis(req: Request, res: Response) {
   const ingredients = req.body.ingredients as string[];
 
   analyzeNutrition(ingredients)
@@ -28,7 +28,7 @@ export function getNutritionAnalysis(req: any, res: any) {
     });
 }
 
-export function searchFood(req: any, res: any) {
+export function searchFood(req: Request, res: Response) {
   const query = req.query.q as string;
 
   searchFoodDatabase(query)
