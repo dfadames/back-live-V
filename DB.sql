@@ -12,6 +12,11 @@ create table Usuario (id_perfil int auto_increment key not null unique,
 						contrasena varchar(100) not null,
 						correo varchar(100) unique not null);
 
+drop table if exists Objetivo;
+create table Objetivo (id_objetivo int auto_increment key not null unique,
+						nombre_objetivo varchar(100) not null unique,
+                        descripcion_objetivo varchar(100) not null);
+
 drop table if exists Perfil;
 create table Perfil (id_perfil int key not null unique, 
 						nombre varchar(100) not null, 
@@ -20,7 +25,20 @@ create table Perfil (id_perfil int key not null unique,
                         altura float not null,
                         peso  float not null,
                         alergias varchar(100),
-                        imc float as (peso / (altura * altura)), -- se puede incluir una tabla para clasificar
+                        habitos_dietarios int not null,
+                        imc float as (peso / (altura * altura)),
+                        clasificacion_imc varchar(100) as (
+							case
+								when imc < 18.5 then 'Bajo peso'
+                                when 18.5 <= imc and imc < 25 then 'Adecuado'
+                                when 25 <= imc and imc < 30 then 'Sobrepeso'
+                                when 30 <= imc and imc < 35 then 'Obesidad grado 1'
+                                when 35 <= imc and imc < 40 then 'Obesidad grado 2'
+                                when 40 <= imc then 'Obesidad grado 3'
+								else null
+							end
+                        ),
+                        nombre_objetivo varchar(100) not null,
                         pgc float as (
 							case
 								when genero = 'Masculino' then (1.20*imc)+(0.23*edad)-16.2
@@ -29,33 +47,40 @@ create table Perfil (id_perfil int key not null unique,
 							end
 						),
                         porcentaje_masa_magra float as (100-pgc),
-                        nivel_actividad_fisica varchar(100) not null, -- se puede incluir una tabla para clasificar
+                        nivel_actividad_fisica varchar(100) not null,
                         metabolismo_basal float as (
 							case
-								when genero = 'Masculino' and nivel_actividad_fisica = 'Sedentario' then 
-									(66.5 +(13.7*peso)+(5*altura*100)-(6.8*edad))*1.2
-                                when genero = 'Masculino' and nivel_actividad_fisica = 'Poco activo' then 
-									(66.5 +(13.7*peso)+(5*altura*100)-(6.8*edad))*1.375
-                                when genero = 'Masculino' and nivel_actividad_fisica = 'Moderadamente activo' then 
-									(66.5 +(13.7*peso)+(5*altura*100)-(6.8*edad))*1.55
-                                when genero = 'Masculino' and nivel_actividad_fisica = 'Activo' then 
-									(66.5 +(13.7*peso)+(5*altura*100)-(6.8*edad))*1.725
-                                when genero = 'Masculino' and nivel_actividad_fisica = 'Muy activo' then 
-									(66.5 +(13.7*peso)+(5*altura*100)-(6.8*edad))*1.9
-								when genero = 'Femenino' and nivel_actividad_fisica = 'Sedentario' then 
-									(665 +(9.6*peso)+(1.8*altura*100)-(4.7*edad))*1.2
-								when genero = 'Femenino' and nivel_actividad_fisica = 'Poco activo' then 
-									(665 +(9.6*peso)+(1.8*altura*100)-(4.7*edad))*1.375
-                                when genero = 'Femenino' and nivel_actividad_fisica = 'Moderadamente activo' then 
-									(665 +(9.6*peso)+(1.8*altura*100)-(4.7*edad))*1.55
-                                when genero = 'Femenino' and nivel_actividad_fisica = 'Activo' then 
-									(665 +(9.6*peso)+(1.8*altura*100)-(4.7*edad))*1.725
-                                when genero = 'Femenino' and nivel_actividad_fisica = 'Muy activo' then 
-									(665 +(9.6*peso)+(1.8*altura*100)-(4.7*edad))*1.9
+								when genero = 'Masculino' then
+									(66.5 +(13.7*peso)+(5*altura*100)-(6.8*edad))
+								when genero = 'Femenino' then
+									(665 +(9.6*peso)+(1.8*altura*100)-(4.7*edad))
+								else null
+							end
+                        ),
+                        calorias_necesarias_diarias float as (
+							case
+								when nivel_actividad_fisica = 'Sedentario' then 
+									metabolismo_basal*1.2
+                                when nivel_actividad_fisica = 'Poco activo' then 
+									metabolismo_basal*1.375
+                                when nivel_actividad_fisica = 'Moderadamente activo' then 
+									metabolismo_basal*1.55
+                                when nivel_actividad_fisica = 'Activo' then 
+									metabolismo_basal*1.725
+                                when nivel_actividad_fisica = 'Muy activo' then 
+									metabolismo_basal*1.9
                                 else null
                             end
                         ),
-                        foreign key (id_perfil) references Usuario (id_perfil));
+                        calorias_ideales_diarias float as (
+							case
+								when nombre_objetivo = 'Bajar de peso' then calorias_necesarias_diarias*0.85
+								when nombre_objetivo = 'Subir de peso' then calorias_necesarias_diarias*1.15
+								else null
+							end
+                        ),
+                        foreign key (id_perfil) references Usuario (id_perfil),
+                        foreign key (nombre_objetivo) references Objetivo (nombre_objetivo));
 
 drop table if exists Progreso;
 create table Progreso (id_progreso int auto_increment key not null unique,
@@ -68,11 +93,6 @@ create table Progreso (id_progreso int auto_increment key not null unique,
                         metabolismo_basal float not null,
                         fecha datetime not null,
 						foreign key (id_perfil) references Perfil (id_perfil));
-
-drop table if exists Objetivo;
-create table Objetivo (id_objetivo int auto_increment key not null unique,
-						nombre_objetivo varchar(100) not null unique,
-                        descripcion_objetivo varchar(100) not null);
                         
 drop table if exists Dieta;
 create table Dieta (id_dieta int auto_increment key not null unique,
@@ -142,6 +162,13 @@ create table Plato_favorito_Perfil (
                         foreign key (id_perfil) references Perfil (id_perfil),
                         foreign key (id_plato) references Plato (id_plato));
 
+drop table if exists Plato_no_favorito_Perfil;
+create table Plato_no_favorito_Perfil (
+						id_perfil int not null,
+                        id_plato int not null,
+                        foreign key (id_perfil) references Perfil (id_perfil),
+                        foreign key (id_plato) references Plato (id_plato));
+
 drop table if exists Comida_pertenece_Plato;
 create table Comida_pertenece_Plato (
 						id_plato int not null,
@@ -149,117 +176,87 @@ create table Comida_pertenece_Plato (
                         foreign key (id_plato) references Plato (id_plato),
                         foreign key (id_comida) references Comida (id_comida));
 
--- -------- --
--- TRIGGERS --
--- -------- --
-
--- DELIMITER //
--- CREATE TRIGGER Calculos_progreso
--- BEFORE INSERT ON Progreso FOR EACH ROW
--- BEGIN
-
---     SET NEW.imc = NEW.peso / (SELECT Perfil.altura * Perfil.altura FROM Perfil WHERE Perfil.id_perfil = NEW.id_perfil);
-
---     SET NEW.pgc = (
---         CASE
---             WHEN (SELECT Perfil.genero FROM Perfil WHERE Perfil.id_perfil = NEW.id_perfil) = 'Masculino' THEN
---                 (1.20 * NEW.imc) + (0.23 * (SELECT Perfil.edad FROM Perfil WHERE Perfil.id_perfil = NEW.id_perfil)) - (10.8 * 1) - 5.4
---             WHEN (SELECT Perfil.genero FROM Perfil WHERE Perfil.id_perfil = NEW.id_perfil) = 'Femenino' THEN
---                 (1.20 * NEW.imc) + (0.23 * (SELECT Perfil.edad FROM Perfil WHERE Perfil.id_perfil = NEW.id_perfil)) - (10.8 * 2) - 5.4
---             ELSE NULL
---         END
---     );
-
---     SET NEW.porcentaje_masa_magra = 100 - NEW.pgc;
-
---     SET NEW.metabolismo_basal = (
---         CASE
---             WHEN (SELECT Perfil.genero FROM Perfil WHERE Perfil.id_perfil = NEW.id_perfil) = 'Masculino' THEN
---                 (
---                     (66.5 + (13.7 * NEW.peso) + (5 * (SELECT Perfil.altura FROM Perfil WHERE Perfil.id_perfil = NEW.id_perfil) * 100) - (6.8 * (SELECT Perfil.edad FROM Perfil WHERE Perfil.id_perfil = NEW.id_perfil)))
---                     *
---                     (
---                         CASE
---                             WHEN NEW.nivel_actividad_fisica = 'Sedentario' THEN 1.2
---                             WHEN NEW.nivel_actividad_fisica = 'Poco activo' THEN 1.375
---                             WHEN NEW.nivel_actividad_fisica = 'Moderadamente activo' THEN 1.55
---                             WHEN NEW.nivel_actividad_fisica = 'Activo' THEN 1.725
---                             WHEN NEW.nivel_actividad_fisica = 'Muy activo' THEN 1.9
---                             ELSE NULL
---                         END
---                     )
---                 )
---             WHEN (SELECT Perfil.genero FROM Perfil WHERE Perfil.id_perfil = NEW.id_perfil) = 'Femenino' THEN
---                 (
---                     (665 + (9.6 * NEW.peso) + (1.8 * (SELECT Perfil.altura FROM Perfil WHERE Perfil.id_perfil = NEW.id_perfil) * 100) - (4.7 * (SELECT Perfil.edad FROM Perfil WHERE Perfil.id_perfil = NEW.id_perfil)))
---                     *
---                     (
---                         CASE
---                             WHEN NEW.nivel_actividad_fisica = 'Sedentario' THEN 1.2
---                             WHEN NEW.nivel_actividad_fisica = 'Poco activo' THEN 1.375
---                             WHEN NEW.nivel_actividad_fisica = 'Moderadamente activo' THEN 1.55
---                             WHEN NEW.nivel_actividad_fisica = 'Activo' THEN 1.725
---                             WHEN NEW.nivel_actividad_fisica = 'Muy activo' THEN 1.9
---                             ELSE NULL
---                         END
---                     )
---                 )
---             ELSE NULL
---         END
---     );
--- END;
--- //
--- DELIMITER ;
-
 -- ------- --
 -- INSERTS --
 -- ------- --
 
-insert into Usuario (nombre_usuario, contrasena, correo) values ('bforerob', '12345678','emailfalso1@gmail.com');
-insert into Usuario (nombre_usuario, contrasena, correo) values ('pepitap', '12345678','emailfalso2@gmail.com');
+insert into Usuario (nombre_usuario, contrasena, correo) 
+			 values ('bforerob', '12345678','emailfalso1@gmail.com');
+insert into Usuario (nombre_usuario, contrasena, correo) 
+			 values ('pepitap', '12345678','emailfalso2@gmail.com');
 
-insert into Perfil (id_perfil, nombre, edad, genero, altura, peso, alergias, nivel_actividad_fisica) values (1, 'Brandolfo Steven', 20, 'Masculino', 1.70, 90, 'Nueces', 'Moderadamente Activo');
-insert into Perfil (id_perfil, nombre, edad, genero, altura, peso, alergias, nivel_actividad_fisica) values (2, 'Pepita Pérez', 20, 'Femenino', 1.70, 55, null, 'Activo');
+insert into Objetivo (nombre_objetivo, descripcion_objetivo) 
+			  values ('Bajar de peso', 'Actualmente el usuario tiene obesidad grado 3 pero se propuso llegar a la meta de 80kg en 1 año');
+insert into Objetivo (nombre_objetivo, descripcion_objetivo) 
+			  values ('Subir de peso', 'Actualmente el usuario tiene bajo peso pero se propuso llegar a la meta de 60kg en 6 meses');
 
-insert into Progreso (id_perfil, peso, imc, pgc, porcentaje_masa_magra, nivel_actividad_fisica, metabolismo_basal, fecha) values (1, 120, 41.5225, 38.227, 61.773, 'Sedentario', 2909.4, '2023-5-1');
-insert into Progreso (id_perfil, peso, imc, pgc, porcentaje_masa_magra, nivel_actividad_fisica, metabolismo_basal, fecha) values (1, 90, 31.1419, 25.7702, 74.2298, 'Moderadamente activo', 3120.93, '2023-10-1');
-insert into Progreso (id_perfil, peso, imc, pgc, porcentaje_masa_magra, nivel_actividad_fisica, metabolismo_basal, fecha) values (2, 45, 15.5709, 17.8851, 82.1149, 'Muy activo', 2487.1, '2023-5-28');
-insert into Progreso (id_perfil, peso, imc, pgc, porcentaje_masa_magra, nivel_actividad_fisica, metabolismo_basal, fecha) values (2, 55, 19.0311, 22.0374, 77.9626, 'Activo', 2423.62, '2023-10-28');
+insert into Perfil (id_perfil, nombre, edad, genero, altura, peso, alergias, habitos_dietarios, nombre_objetivo, nivel_actividad_fisica) 
+			values (1, 'Brandolfo Steven', 20, 'Masculino', 1.70, 90, 'Nueces', 3, 'Bajar de peso', 'Moderadamente Activo');
+insert into Perfil (id_perfil, nombre, edad, genero, altura, peso, alergias, habitos_dietarios, nombre_objetivo, nivel_actividad_fisica) 
+			values (2, 'Pepita Pérez', 20, 'Femenino', 1.70, 55, null, 3, 'Subir de peso', 'Activo');
 
-insert into Objetivo (nombre_objetivo, descripcion_objetivo) values ('Bajar de peso', 'Actualmente el usuario tiene obesidad grado 3 pero se propuso llegar a la meta de 80kg en 1 año');
-insert into Objetivo (nombre_objetivo, descripcion_objetivo) values ('Subir de peso', 'Actualmente el usuario tiene bajo peso pero se propuso llegar a la meta de 60kg en 6 meses');
+insert into Progreso (id_perfil, peso, imc, pgc, porcentaje_masa_magra, nivel_actividad_fisica, metabolismo_basal, fecha) 
+			  values (1, 120, 41.5225, 38.227, 61.773, 'Sedentario', 2909.4, '2023-5-1');
+insert into Progreso (id_perfil, peso, imc, pgc, porcentaje_masa_magra, nivel_actividad_fisica, metabolismo_basal, fecha) 
+			  values (1, 90, 31.1419, 25.7702, 74.2298, 'Moderadamente activo', 3120.93, '2023-10-1');
+insert into Progreso (id_perfil, peso, imc, pgc, porcentaje_masa_magra, nivel_actividad_fisica, metabolismo_basal, fecha) 
+			  values (2, 45, 15.5709, 17.8851, 82.1149, 'Muy activo', 2487.1, '2023-5-28');
+insert into Progreso (id_perfil, peso, imc, pgc, porcentaje_masa_magra, nivel_actividad_fisica, metabolismo_basal, fecha) 
+			  values (2, 55, 19.0311, 22.0374, 77.9626, 'Activo', 2423.62, '2023-10-28');
 
-insert into Dieta (nombre_dieta, descripcion_dieta) values ('Dieta para bajar de peso', 'Se propone un deficit calorico y teniendo en cuenta no incluir comidas con nueces');
-insert into Dieta (nombre_dieta, descripcion_dieta) values ('Dieta para subir de peso', 'Se propone un superavit calorico');
+insert into Dieta (nombre_dieta, descripcion_dieta) 
+		   values ('Vegetariana, Alergia a nueces', 'No incluir carnes ni nueces');
+insert into Dieta (nombre_dieta, descripcion_dieta) 
+		   values ('Sin restriccion', 'No se limitan las recomendaciones');
 
-insert into Plato (nombre_plato, descripcion_plato, calorias, carbohidratos, proteinas, grasas, tipo) values ('Agua molida', 'Se muele el agua', 0, 0, 0, 0, 'Almuerzo');
-insert into Plato (nombre_plato, descripcion_plato, calorias, carbohidratos, proteinas, grasas, tipo) values ('Lechona tolimense', 'Lechona con arroz', 800, 25, 20, 50, 'Desayuno');
+insert into Plato (nombre_plato, descripcion_plato, calorias, carbohidratos, proteinas, grasas, tipo) 
+		   values ('Agua molida', 'Se muele el agua', 0, 0, 0, 0, 'Almuerzo');
+insert into Plato (nombre_plato, descripcion_plato, calorias, carbohidratos, proteinas, grasas, tipo) 
+		   values ('Lechona tolimense', 'Lechona con arroz', 800, 25, 20, 50, 'Desayuno');
 
-insert into Comida (nombre_comida, descripcion_comida, calorias, carbohidratos, proteinas, grasas, tipo) values ('Agua', 'Agua potable', 0, 0, 0, 0, 'Bebida');
-insert into Comida (nombre_comida, descripcion_comida, calorias, carbohidratos, proteinas, grasas, tipo) values ('Lechona', 'Lechona con arroz', 800, 25, 20, 50, 'Alimento proteico');
-insert into Comida (nombre_comida, descripcion_comida, calorias, carbohidratos, proteinas, grasas, tipo) values ('Arroz', 'Lechona con arroz', 800, 25, 20, 50, 'Harina');
+insert into Comida (nombre_comida, descripcion_comida, calorias, carbohidratos, proteinas, grasas, tipo) 
+			values ('Agua', 'Agua potable', 0, 0, 0, 0, 'Bebida');
+insert into Comida (nombre_comida, descripcion_comida, calorias, carbohidratos, proteinas, grasas, tipo) 
+			values ('Lechona', 'Lechona con arroz', 800, 25, 20, 50, 'Alimento proteico');
+insert into Comida (nombre_comida, descripcion_comida, calorias, carbohidratos, proteinas, grasas, tipo) 
+			values ('Arroz', 'Lechona con arroz', 800, 25, 20, 50, 'Harina');
 
-insert into Registro_comida (id_perfil, id_plato, fecha) values (1, 1, '2023-10-31');
-insert into Registro_comida (id_perfil, id_plato, fecha) values (2, 2, '2023-10-31');
+insert into Registro_comida (id_perfil, id_plato, fecha) 
+					 values (1, 1, '2023-10-31');
+insert into Registro_comida (id_perfil, id_plato, fecha) 
+					 values (2, 2, '2023-10-31');
 
-insert into Perfil_tiene_Objetivo (id_perfil, id_objetivo) values (1, 1);
-insert into Perfil_tiene_Objetivo (id_perfil, id_objetivo) values (2, 2);
+insert into Perfil_tiene_Objetivo (id_perfil, id_objetivo) 
+						   values (1, 1);
+insert into Perfil_tiene_Objetivo (id_perfil, id_objetivo) 
+						   values (2, 2);
 
-insert into Perfil_sigue_Dieta (id_perfil, id_dieta) values (1, 1);
-insert into Perfil_sigue_Dieta (id_perfil, id_dieta) values (2, 2);
+insert into Perfil_sigue_Dieta (id_perfil, id_dieta) 
+						values (1, 1);
+insert into Perfil_sigue_Dieta (id_perfil, id_dieta) 
+						values (2, 2);
 
-insert into Objetivo_tiene_Dieta (id_objetivo, id_dieta) values (1, 1);
-insert into Objetivo_tiene_Dieta (id_objetivo, id_dieta) values (2, 2);
+insert into Objetivo_tiene_Dieta (id_objetivo, id_dieta) 
+						  values (1, 1);
+insert into Objetivo_tiene_Dieta (id_objetivo, id_dieta) 
+						  values (2, 2);
 
-insert into Plato_pertenece_Dieta (id_plato, id_dieta) values (1, 1);
-insert into Plato_pertenece_Dieta (id_plato, id_dieta) values (2, 2);
+insert into Plato_pertenece_Dieta (id_plato, id_dieta) 
+						   values (1, 1);
+insert into Plato_pertenece_Dieta (id_plato, id_dieta) 
+						   values (2, 2);
 
-insert into Plato_favorito_Perfil (id_perfil, id_plato) values (1, 1);
-insert into Plato_favorito_Perfil (id_perfil, id_plato) values (2, 2);
+insert into Plato_favorito_Perfil (id_perfil, id_plato) 
+						   values (1, 1);
+insert into Plato_favorito_Perfil (id_perfil, id_plato) 
+						   values (2, 2);
 
-insert into Comida_pertenece_Plato (id_plato, id_comida) values (1, 1);
-insert into Comida_pertenece_Plato (id_plato, id_comida) values (2, 2);
-insert into Comida_pertenece_Plato (id_plato, id_comida) values (2, 3);
+insert into Comida_pertenece_Plato (id_plato, id_comida) 
+							values (1, 1);
+insert into Comida_pertenece_Plato (id_plato, id_comida) 
+							values (2, 2);
+insert into Comida_pertenece_Plato (id_plato, id_comida) 
+							values (2, 3);
 
 -- ------- --
 -- Selects --
