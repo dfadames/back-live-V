@@ -75,7 +75,7 @@ function noRepeticiones(objetoJSON: any) {
     from: objetoJSON.from,      // Número de primera receta mostrada (1)
     to: objetoJSON.to,          // Número de última receta mostrada (20 máximo)
     count: objetoJSON.count,    // Número de recetas que coinciden con la búsqueda
-    _links: objetoJSON._links,
+    _links: objetoJSON._links,  // Link a referencias de la receta
     hits: [] as any[]           // Arreglo que contiene las recetas que son también objetos con atributos propios
   };
 
@@ -94,6 +94,17 @@ function noRepeticiones(objetoJSON: any) {
       recetasBuscadas.hits.unshift(objetoJSON.hits[i]);
     }
   }
-
-  return recetasBuscadas;
+  // Se devuelve un objeto con solo los campos que se necesitan
+  let Busquedas = recetasBuscadas.hits.map(hit => {
+    return {
+      label: hit.recipe.label,
+      image: hit.recipe.images.SMALL,
+      calories: hit.recipe.calories,
+      fat: hit.recipe.totalNutrients.FAT.quantity,
+      carbs: hit.recipe.totalNutrients.CHOCDF.quantity,
+      protein: hit.recipe.totalNutrients.PROCNT.quantity
+    };
+  });
+  
+  return Busquedas;
 }
