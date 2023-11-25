@@ -68,15 +68,16 @@ export function searchByName(req: any, res: any) {
     });
 }
 
+
+// Función para evitar repeticiones de recetas y mostrar solo ciertos campos de la receta
 function noRepeticiones(objetoJSON: any) { 
-  // Se crea un objeto con la misma estructura del objetoJSON pero con hits vacío
   let recetasBuscadas = 
   {
-    from: objetoJSON.from,      // Número de primera receta mostrada (1)
-    to: objetoJSON.to,          // Número de última receta mostrada (20 máximo)
-    count: objetoJSON.count,    // Número de recetas que coinciden con la búsqueda
-    _links: objetoJSON._links,  // Link a referencias de la receta
-    hits: [] as any[]           // Arreglo que contiene las recetas que son también objetos con atributos propios
+    from: objetoJSON.from,
+    to: objetoJSON.to,
+    count: objetoJSON.count,
+    _links: objetoJSON._links,
+    hits: [] as any[]
   };
 
   for(let i = 0; i < objetoJSON.hits.length; i++){
@@ -94,9 +95,10 @@ function noRepeticiones(objetoJSON: any) {
       recetasBuscadas.hits.unshift(objetoJSON.hits[i]);
     }
   }
-  // Se devuelve un objeto con solo los campos que se necesitan
+  // Se devuelve un objeto con solo los campos que se necesitan (filtro)
   let Busquedas = recetasBuscadas.hits.map(hit => {
     return {
+      uri: hit.recipe.uri,
       label: hit.recipe.label,
       image: hit.recipe.images.SMALL,
       calories: hit.recipe.calories,
