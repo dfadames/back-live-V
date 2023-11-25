@@ -59,9 +59,52 @@ export function searchByName(req: any, res: any) {
   const query = req.query.q as string;
 
   searchName(query)
-    .then((recipes) => res.json(recipes))
+    .then((recipes) => {
+      const recetas = noRepeticiones(recipes);
+      res.json(recetas)})
     .catch((error) => {
       console.error(error);
       res.status(500).json({ error: "Internal Server Error" });
     });
+}
+
+function noRepeticiones(objetoJSON: any) { 
+  // Se crea un objeto con la misma estructura del objetoJSON pero con hits vacío
+  let recetasBuscadas = 
+  {
+    from: objetoJSON.from,      // Número de primera receta mostrada (1)
+    to: objetoJSON.to,          // Número de última receta mostrada (20 máximo)
+    count: objetoJSON.count,    // Número de recetas que coinciden con la búsqueda
+    _links: objetoJSON._links,  // Link a referencias de la receta
+    hits: [] as any[]           // Arreglo que contiene las recetas que son también objetos con atributos propios
+  };
+
+  for(let i = 0; i < objetoJSON.hits.length; i++){
+    let noRepite = true;
+    if (i < (objetoJSON.hits.length-1)){
+      for(let j = i+1; j < objetoJSON.hits.length; j++){
+        if(objetoJSON.hits[j].recipe.label == objetoJSON.hits[i].recipe.label){
+          noRepite = false;
+        }
+      }
+      if(noRepite){
+        recetasBuscadas.hits.unshift(objetoJSON.hits[i]);
+      }
+    } else {
+      recetasBuscadas.hits.unshift(objetoJSON.hits[i]);
+    }
+  }
+  // Se devuelve un objeto con solo los campos que se necesitan
+  let Busquedas = recetasBuscadas.hits.map(hit => {
+    return {
+      label: hit.recipe.label,
+      image: hit.recipe.images.SMALL,
+      calories: hit.recipe.calories,
+      fat: hit.recipe.totalNutrients.FAT.quantity,
+      carbs: hit.recipe.totalNutrients.CHOCDF.quantity,
+      protein: hit.recipe.totalNutrients.PROCNT.quantity
+    };
+  });
+  
+  return Busquedas;
 }
