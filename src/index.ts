@@ -45,6 +45,8 @@ app.get("/usuarios", getUsuarios);
 
 //rutas para el acceso de informacion del perfil
 app.get("/perfil", getProfileData, (req: any, res: any) => {
+  console.log("hjopa");
+  
   res.json(req.body.profileInfo);
 });
 

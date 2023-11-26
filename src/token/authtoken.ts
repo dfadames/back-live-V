@@ -32,6 +32,7 @@ export function authenticateToken(req: any, res: any, next: any) {
       }
 
       if (results.length !== 1) {
+        
         return res.status(404).send("Usuario no encontrado");
       }
 

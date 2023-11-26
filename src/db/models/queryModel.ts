@@ -23,7 +23,7 @@ export const executeQuery = (
         console.error("Error al realizar la consulta:", error);
         return callback(error, null);
       }
-
+      
       callback(null, results);
     });
   });
