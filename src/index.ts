@@ -25,6 +25,7 @@ const PORT = process.env.PORT;
 import { login, register } from "./controllers/authController";
 import { ping, getUsuarios } from "./controllers/othersController";
 import { getProfileInfo } from "./controllers/profileController";
+import { insertProfileData } from "./controllers/profileController";
 import {
   getRecipes,
   getNutritionAnalysis,
@@ -48,6 +49,8 @@ app.get("/perfil", getProfileData, (req: any, res: any) => {
   res.json(req.body.profileInfo[0]);
 });
 
+//ruta de ingreso informacion del perfil
+app.put("/crearperfil", authenticateToken, insertProfileData);
 //rutas para acceso a la api externa
 app.get("/api/recetas", getProfileData, getRecipes);
 app.post("/api/nutricion", getNutritionAnalysis);
