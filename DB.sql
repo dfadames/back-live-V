@@ -33,19 +33,19 @@ create table Perfil (id_perfil int key not null unique,
                         imc float as (peso / (altura * altura)),
                         clasificacion_imc varchar(100) as (
 							case
-								when imc < 18.5 then 'Bajo peso'
-                                when 18.5 <= imc and imc < 25 then 'Adecuado'
-                                when 25 <= imc and imc < 30 then 'Sobrepeso'
-                                when 30 <= imc and imc < 35 then 'Obesidad grado 1'
-                                when 35 <= imc and imc < 40 then 'Obesidad grado 2'
-                                when 40 <= imc then 'Obesidad grado 3'
+								when imc < 18.5 then 'Underweight'
+                                when 18.5 <= imc and imc < 25 then 'Normal weight'
+                                when 25 <= imc and imc < 30 then 'Overweight'
+                                when 30 <= imc and imc < 35 then 'Obese class 1'
+                                when 35 <= imc and imc < 40 then 'Obese class 2'
+                                when 40 <= imc then 'Obese class 3'
 								else null
 							end
                         ),
                         pgc float as (
 							case
-								when genero = 'Masculino' then (1.20*imc)+(0.23*edad)-16.2
-								when genero = 'Femenino' then (1.20*imc)+(0.23*edad)-5.4
+								when genero = 'Male' then (1.20*imc)+(0.23*edad)-16.2
+								when genero = 'Female' then (1.20*imc)+(0.23*edad)-5.4
 								else null
 							end
 						),
@@ -53,32 +53,28 @@ create table Perfil (id_perfil int key not null unique,
                         nivel_actividad_fisica varchar(100) not null,
                         metabolismo_basal float as (
 							case
-								when genero = 'Masculino' then
+								when genero = 'Male' then
 									(66.5 +(13.7*peso)+(5*altura*100)-(6.8*edad))
-								when genero = 'Femenino' then
+								when genero = 'Female' then
 									(665 +(9.6*peso)+(1.8*altura*100)-(4.7*edad))
 								else null
 							end
                         ),
                         calorias_necesarias_diarias float as (
 							case
-								when nivel_actividad_fisica = 'Sedentario' then 
-									metabolismo_basal*1.2
-                                when nivel_actividad_fisica = 'Poco activo' then 
+                                when nivel_actividad_fisica = 'low' then 
 									metabolismo_basal*1.375
-                                when nivel_actividad_fisica = 'Moderadamente activo' then 
+                                when nivel_actividad_fisica = 'medium' then 
 									metabolismo_basal*1.55
-                                when nivel_actividad_fisica = 'Activo' then 
+                                when nivel_actividad_fisica = 'high' then 
 									metabolismo_basal*1.725
-                                when nivel_actividad_fisica = 'Muy activo' then 
-									metabolismo_basal*1.9
                                 else null
                             end
                         ),
                         calorias_ideales_diarias float as (
 							case
-								when nombre_objetivo = 'Bajar de peso' then calorias_necesarias_diarias*0.85
-								when nombre_objetivo = 'Subir de peso' then calorias_necesarias_diarias*1.15
+								when nombre_objetivo = 'Lose Weight' then calorias_necesarias_diarias*0.85
+								when nombre_objetivo = 'Increase muscle mass' then calorias_necesarias_diarias*1.15
 								else null
 							end
                         ),
@@ -161,40 +157,40 @@ insert into Usuario (nombre_usuario, contrasena, correo)
 			 values ('pepitap', '12345678','emailfalso2@gmail.com');
 
 insert into Objetivo (nombre_objetivo, descripcion_objetivo) 
-			  values ('Bajar de peso', 'Actualmente el usuario tiene obesidad grado 3 pero se propuso llegar a la meta de 80kg en 1 año');
+			  values ('Lose Weight', 'The user currently has grade 3 obesity but has set a goal to reach 80kg in 1 year');
 insert into Objetivo (nombre_objetivo, descripcion_objetivo) 
-			  values ('Subir de peso', 'Actualmente el usuario tiene bajo peso pero se propuso llegar a la meta de 60kg en 6 meses');
+			  values ('Increase muscle mass', 'The user currently has underweight but has set a goal to reach 60kg in 6 months');
 
 insert into Perfil (id_perfil, nombre, edad, genero, altura, peso, alergias, habitos_dietarios, nombre_objetivo, dieta, favorita, no_favorita, nivel_actividad_fisica) 
-			values (1, 'Brandolfo Steven', 20, 'Masculino', 1.70, 90, 'Nueces', 3, 'Bajar de peso', 'Vegetariana', 'Agua molida', 'Changua', 'Moderadamente Activo');
+			values (1, 'Brandolfo Steven', 20, 'Male', 1.70, 90, 'Peanut-free', 3, 'Lose Weight', 'Vegetarian', 'Agua molida', 'Changua', 'medium');
 insert into Perfil (id_perfil, nombre, edad, genero, altura, peso, alergias, habitos_dietarios, nombre_objetivo, dieta, favorita, no_favorita, nivel_actividad_fisica) 
-			values (2, 'Pepita Pérez', 20, 'Femenino', 1.70, 55, null, 3, 'Subir de peso', 'Sin restriccion', 'Pizza', 'Changua', 'Activo');
+			values (2, 'Pepita Pérez', 20, 'Female', 1.70, 55, 'None', 3, 'Increase muscle mass', 'None', 'Pizza', 'Changua', 'high');
 
 insert into Progreso (id_perfil, peso, imc, pgc, porcentaje_masa_magra, nivel_actividad_fisica, metabolismo_basal, fecha) 
-			  values (1, 120, 41.5225, 38.227, 61.773, 'Sedentario', 2909.4, '2023-5-1');
+			  values (1, 120, 41.5225, 38.227, 61.773, 'low', 2909.4, '2023-5-1');
 insert into Progreso (id_perfil, peso, imc, pgc, porcentaje_masa_magra, nivel_actividad_fisica, metabolismo_basal, fecha) 
-			  values (1, 90, 31.1419, 25.7702, 74.2298, 'Moderadamente activo', 3120.93, '2023-10-1');
+			  values (1, 90, 31.1419, 25.7702, 74.2298, 'medium', 3120.93, '2023-10-1');
 insert into Progreso (id_perfil, peso, imc, pgc, porcentaje_masa_magra, nivel_actividad_fisica, metabolismo_basal, fecha) 
-			  values (2, 45, 15.5709, 17.8851, 82.1149, 'Muy activo', 2487.1, '2023-5-28');
+			  values (2, 45, 15.5709, 17.8851, 82.1149, 'high', 2487.1, '2023-5-28');
 insert into Progreso (id_perfil, peso, imc, pgc, porcentaje_masa_magra, nivel_actividad_fisica, metabolismo_basal, fecha) 
-			  values (2, 55, 19.0311, 22.0374, 77.9626, 'Activo', 2423.62, '2023-10-28');
+			  values (2, 55, 19.0311, 22.0374, 77.9626, 'high', 2423.62, '2023-10-28');
 
 insert into Dieta (nombre_dieta, descripcion_dieta) 
-		   values ('Vegetariana', 'No incluir carnes');
+		   values ('Vegetarian', 'Do not include meats');
 insert into Dieta (nombre_dieta, descripcion_dieta) 
-		   values ('Sin restriccion', 'No se limitan las recomendaciones');
+		   values ('None', 'Recommendations are not limited');
 
 insert into Plato (nombre_plato, descripcion_plato, calorias, carbohidratos, proteinas, grasas, tipo) 
-		   values ('Agua molida', 'Se muele el agua', 0, 0, 0, 0, 'Almuerzo');
+		   values ('Agua molida', 'The water is ground', 0, 0, 0, 0, 'Lunch');
 insert into Plato (nombre_plato, descripcion_plato, calorias, carbohidratos, proteinas, grasas, tipo) 
-		   values ('Lechona tolimense', 'Lechona con arroz', 800, 25, 20, 50, 'Desayuno');
+		   values ('Lechona tolimense', 'Roasted pig with rice', 800, 25, 20, 50, 'Breakfast');
 
 insert into Comida (nombre_comida, descripcion_comida, calorias, carbohidratos, proteinas, grasas, tipo) 
-			values ('Agua', 'Agua potable', 0, 0, 0, 0, 'Bebida');
+			values ('Water', 'Drinking water', 0, 0, 0, 0, 'Drink');
 insert into Comida (nombre_comida, descripcion_comida, calorias, carbohidratos, proteinas, grasas, tipo) 
-			values ('Lechona', 'Lechona con arroz', 800, 25, 20, 50, 'Alimento proteico');
+			values ('Lechona', 'Roasted pig', 800, 25, 20, 50, 'Protein food.');
 insert into Comida (nombre_comida, descripcion_comida, calorias, carbohidratos, proteinas, grasas, tipo) 
-			values ('Arroz', 'Lechona con arroz', 800, 25, 20, 50, 'Harina');
+			values ('Rice', 'White rice', 800, 25, 20, 50, 'Cereal');
 
 insert into Registro_comida (id_perfil, id_plato, fecha) 
 					 values (1, 1, '2023-10-31');
