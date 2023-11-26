@@ -72,13 +72,14 @@ export function searchByName(req: any, res: any) {
 // Funcion para devolver un objeto con solo los campos que se necesitan (filtro)
 function formato(objeto: any) {
   return {
-  id: (objeto.recipe.uri).split("_")[1],
-  label: objeto.recipe.label,
-  image: objeto.recipe.images.SMALL,
-  calories: objeto.recipe.calories,
-  fat: objeto.recipe.totalNutrients.FAT.quantity,
-  carbs: objeto.recipe.totalNutrients.CHOCDF.quantity,
-  protein: objeto.recipe.totalNutrients.PROCNT.quantity
+    id: (objeto.recipe.uri).split("_")[1],
+    label: objeto.recipe.label,
+    image: objeto.recipe.images.SMALL,
+    calories: objeto.recipe.calories,
+    fat: objeto.recipe.totalNutrients.FAT.quantity,
+    carbs: objeto.recipe.totalNutrients.CHOCDF.quantity,
+    protein: objeto.recipe.totalNutrients.PROCNT.quantity,
+    ingredients: objeto.recipe.ingredientLines
   };
 }
 
