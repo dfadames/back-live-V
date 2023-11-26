@@ -54,7 +54,9 @@ export const register = (req: Request, res: Response) => {
       }
     } else {
       console.log("Usuario creado: " + username);
-      res.status(200).json({ message: "Registro exitoso" });
+      const user = { username: username };
+      const token = jwt.sign(user, secretKey);
+      res.status(200).json({ token });
     }
   });
 };
