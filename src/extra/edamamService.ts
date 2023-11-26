@@ -31,7 +31,6 @@ export function searchRecipes(profileInfo: any) {
     app_key: RECIPE_APP_KEY,
     excluded: profile.alergias,
     random: "true",
-    calories: `${calories - 100}-${calories + 100}`
   };
 
   // Parametros Edamam enviaría
@@ -47,18 +46,34 @@ export function searchRecipes(profileInfo: any) {
     return `https://api.edamam.com/api/recipes/v2?type=public&${queryString}&mealType=${encodeURIComponent(mealType)}`;
   };
 
-  // Crear requests para cada tipo de comida
-  const breakfastPromise = axios.get(buildQueryString("Breakfast"));
-  const lunchPromise = axios.get(buildQueryString("Lunch"));
-  const dinnerPromise = axios.get(buildQueryString("Dinner"));
+  const fetchRecipes = (mealType: string, accumulatedRecipes: any[] = []): Promise<any[]> => {
+    return axios.get(buildQueryString(mealType))
+      .then(response => {
+        const validRecipes: any[] = response.data.hits
+          .filter((hit: any) => {
+            const recipeCalories: number = hit.recipe.calories;
+            return recipeCalories >= (calories - 100) && recipeCalories <= (calories + 100);
+          })
+          .map((hit: any) => hit.recipe); // Only include the recipe part
 
-  return Promise.all([breakfastPromise, lunchPromise, dinnerPromise])
-    .then(responses => {
-      return responses.map(response => response.data.hits.slice(0, 3)).flat();
-    })
-    .catch(error => {
-      throw error;
-    });
+        accumulatedRecipes.push(...validRecipes);
+        accumulatedRecipes = accumulatedRecipes.slice(0, 3);
+
+        if (accumulatedRecipes.length < 3) {
+          return fetchRecipes(mealType, accumulatedRecipes);
+        } else {
+          return Promise.resolve(accumulatedRecipes);
+        }
+      });
+  };
+
+  return Promise.all([
+    fetchRecipes("Breakfast"),
+    fetchRecipes("Lunch"),
+    fetchRecipes("Dinner")
+  ])
+  .then(allRecipes => allRecipes.flat().map(recipe => ({ recipe }))) // Structure the data as an array of { recipe: {...} }
+  .catch(error => Promise.reject(error));
 }
 
 export function analyzeNutrition(ingr: string[]) {
