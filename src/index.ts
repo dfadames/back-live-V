@@ -45,7 +45,7 @@ app.get("/usuarios", getUsuarios);
 
 //rutas para el acceso de informacion del perfil
 app.get("/perfil", getProfileData, (req: any, res: any) => {
-  res.json(req.body.profileInfo);
+  res.json(req.body.profileInfo[0]);
 });
 
 //rutas para acceso a la api externa
