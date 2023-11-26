@@ -6,3 +6,8 @@ export const getProfileInfoById = (userId: number, callback: Function) => {
 
   executeQuery(sql, [userId], callback);
 };
+
+
+
+
+
