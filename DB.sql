@@ -26,6 +26,10 @@ create table Perfil (id_perfil int key not null unique,
                         peso  float not null,
                         alergias varchar(100),
                         habitos_dietarios int not null,
+                        nombre_objetivo varchar(100) not null,
+                        dieta varchar(100) not null,
+                        favorita varchar(100) not null,
+                        no_favorita varchar(100) not null,
                         imc float as (peso / (altura * altura)),
                         clasificacion_imc varchar(100) as (
 							case
@@ -38,7 +42,6 @@ create table Perfil (id_perfil int key not null unique,
 								else null
 							end
                         ),
-                        nombre_objetivo varchar(100) not null,
                         pgc float as (
 							case
 								when genero = 'Masculino' then (1.20*imc)+(0.23*edad)-16.2
@@ -93,7 +96,7 @@ create table Progreso (id_progreso int auto_increment key not null unique,
                         metabolismo_basal float not null,
                         fecha datetime not null,
 						foreign key (id_perfil) references Perfil (id_perfil));
-                        
+
 drop table if exists Dieta;
 create table Dieta (id_dieta int auto_increment key not null unique,
 						nombre_dieta varchar(100) not null unique,
@@ -127,20 +130,6 @@ create table Registro_comida (id_registro_comida int auto_increment key not null
 						foreign key (id_perfil) references Perfil (id_perfil),
                         foreign key (id_plato) references Plato (id_plato));
 
-drop table if exists Perfil_tiene_Objetivo;
-create table Perfil_tiene_Objetivo (
-						id_perfil int not null unique,
-                        id_objetivo int not null,
-                        foreign key (id_perfil) references Perfil (id_perfil),
-                        foreign key (id_objetivo) references Objetivo (id_objetivo));
-
-drop table if exists Perfil_sigue_Dieta;
-create table Perfil_sigue_Dieta (
-						id_perfil int not null unique,
-                        id_dieta int not null,
-                        foreign key (id_perfil) references Perfil (id_perfil),
-                        foreign key (id_dieta) references Dieta (id_dieta));
-
 drop table if exists Objetivo_tiene_Dieta;
 create table Objetivo_tiene_Dieta (
 						id_objetivo int not null,
@@ -154,20 +143,6 @@ create table Plato_pertenece_Dieta (
                         id_dieta int not null,
                         foreign key (id_plato) references Plato (id_plato),
                         foreign key (id_dieta) references Dieta (id_dieta));
-
-drop table if exists Plato_favorito_Perfil;
-create table Plato_favorito_Perfil (
-						id_perfil int not null,
-                        id_plato int not null,
-                        foreign key (id_perfil) references Perfil (id_perfil),
-                        foreign key (id_plato) references Plato (id_plato));
-
-drop table if exists Plato_no_favorito_Perfil;
-create table Plato_no_favorito_Perfil (
-						id_perfil int not null,
-                        id_plato int not null,
-                        foreign key (id_perfil) references Perfil (id_perfil),
-                        foreign key (id_plato) references Plato (id_plato));
 
 drop table if exists Comida_pertenece_Plato;
 create table Comida_pertenece_Plato (
@@ -190,10 +165,10 @@ insert into Objetivo (nombre_objetivo, descripcion_objetivo)
 insert into Objetivo (nombre_objetivo, descripcion_objetivo) 
 			  values ('Subir de peso', 'Actualmente el usuario tiene bajo peso pero se propuso llegar a la meta de 60kg en 6 meses');
 
-insert into Perfil (id_perfil, nombre, edad, genero, altura, peso, alergias, habitos_dietarios, nombre_objetivo, nivel_actividad_fisica) 
-			values (1, 'Brandolfo Steven', 20, 'Masculino', 1.70, 90, 'Nueces', 3, 'Bajar de peso', 'Moderadamente Activo');
-insert into Perfil (id_perfil, nombre, edad, genero, altura, peso, alergias, habitos_dietarios, nombre_objetivo, nivel_actividad_fisica) 
-			values (2, 'Pepita Pérez', 20, 'Femenino', 1.70, 55, null, 3, 'Subir de peso', 'Activo');
+insert into Perfil (id_perfil, nombre, edad, genero, altura, peso, alergias, habitos_dietarios, nombre_objetivo, dieta, favorita, no_favorita, nivel_actividad_fisica) 
+			values (1, 'Brandolfo Steven', 20, 'Masculino', 1.70, 90, 'Nueces', 3, 'Bajar de peso', 'Vegetariana', 'Agua molida', 'Changua', 'Moderadamente Activo');
+insert into Perfil (id_perfil, nombre, edad, genero, altura, peso, alergias, habitos_dietarios, nombre_objetivo, dieta, favorita, no_favorita, nivel_actividad_fisica) 
+			values (2, 'Pepita Pérez', 20, 'Femenino', 1.70, 55, null, 3, 'Subir de peso', 'Sin restriccion', 'Pizza', 'Changua', 'Activo');
 
 insert into Progreso (id_perfil, peso, imc, pgc, porcentaje_masa_magra, nivel_actividad_fisica, metabolismo_basal, fecha) 
 			  values (1, 120, 41.5225, 38.227, 61.773, 'Sedentario', 2909.4, '2023-5-1');
@@ -205,7 +180,7 @@ insert into Progreso (id_perfil, peso, imc, pgc, porcentaje_masa_magra, nivel_ac
 			  values (2, 55, 19.0311, 22.0374, 77.9626, 'Activo', 2423.62, '2023-10-28');
 
 insert into Dieta (nombre_dieta, descripcion_dieta) 
-		   values ('Vegetariana, Alergia a nueces', 'No incluir carnes ni nueces');
+		   values ('Vegetariana', 'No incluir carnes');
 insert into Dieta (nombre_dieta, descripcion_dieta) 
 		   values ('Sin restriccion', 'No se limitan las recomendaciones');
 
@@ -226,16 +201,6 @@ insert into Registro_comida (id_perfil, id_plato, fecha)
 insert into Registro_comida (id_perfil, id_plato, fecha) 
 					 values (2, 2, '2023-10-31');
 
-insert into Perfil_tiene_Objetivo (id_perfil, id_objetivo) 
-						   values (1, 1);
-insert into Perfil_tiene_Objetivo (id_perfil, id_objetivo) 
-						   values (2, 2);
-
-insert into Perfil_sigue_Dieta (id_perfil, id_dieta) 
-						values (1, 1);
-insert into Perfil_sigue_Dieta (id_perfil, id_dieta) 
-						values (2, 2);
-
 insert into Objetivo_tiene_Dieta (id_objetivo, id_dieta) 
 						  values (1, 1);
 insert into Objetivo_tiene_Dieta (id_objetivo, id_dieta) 
@@ -244,11 +209,6 @@ insert into Objetivo_tiene_Dieta (id_objetivo, id_dieta)
 insert into Plato_pertenece_Dieta (id_plato, id_dieta) 
 						   values (1, 1);
 insert into Plato_pertenece_Dieta (id_plato, id_dieta) 
-						   values (2, 2);
-
-insert into Plato_favorito_Perfil (id_perfil, id_plato) 
-						   values (1, 1);
-insert into Plato_favorito_Perfil (id_perfil, id_plato) 
 						   values (2, 2);
 
 insert into Comida_pertenece_Plato (id_plato, id_comida) 
@@ -270,9 +230,6 @@ select*from Dieta;
 select*from Plato;
 select*from Comida;
 select*from Registro_comida;
-select Perfil.id_perfil, Objetivo.id_objetivo, Perfil.nombre, Objetivo.nombre_objetivo from Perfil_tiene_Objetivo join Perfil on Perfil_tiene_Objetivo.id_perfil = Perfil.id_perfil join Objetivo on Perfil_tiene_Objetivo.id_objetivo = Objetivo.id_objetivo;
-select Perfil.id_perfil, Dieta.id_dieta, Perfil.nombre, Dieta.nombre_dieta from Perfil_sigue_Dieta join Perfil on Perfil_sigue_Dieta.id_perfil = Perfil.id_perfil join Dieta on Perfil_sigue_Dieta.id_dieta = Dieta.id_dieta;
 select Objetivo.id_objetivo, Dieta.id_dieta, Objetivo.nombre_objetivo, Dieta.nombre_dieta from Objetivo_tiene_Dieta join Objetivo on Objetivo_tiene_Dieta.id_objetivo = Objetivo.id_objetivo join Dieta on Objetivo_tiene_Dieta.id_dieta = Dieta.id_dieta;
 select Plato.id_plato, Dieta.id_dieta, Plato.nombre_plato, Dieta.nombre_dieta from Plato_pertenece_Dieta join Plato on Plato_pertenece_Dieta.id_plato = Plato.id_plato join Dieta on Plato_pertenece_Dieta.id_dieta = Dieta.id_dieta;
-select Perfil.id_perfil, Plato.id_plato, Perfil.nombre, Plato.nombre_plato from Plato_favorito_Perfil join Plato on Plato_favorito_Perfil.id_plato = Plato.id_plato join Perfil on Plato_favorito_Perfil.id_perfil = Perfil.id_perfil;
 select Plato.id_plato, Comida.id_comida, Plato.nombre_plato, Comida.nombre_comida from Comida_pertenece_Plato join Plato on Comida_pertenece_Plato.id_plato = Plato.id_plato join Comida on Comida_pertenece_Plato.id_comida = Comida.id_comida;
