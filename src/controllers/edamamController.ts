@@ -42,12 +42,13 @@ export function searchFood(req: Request, res: Response) {
 }
 
 // Función que recibe los datos y llama a la función search que se conecta con la api
-export function searchByNameAndCalories(req: any, res: any) {
-  const query = req.query.q as string;
-  const calories = req.query.calories as string;
+export function searchById(req: any, res: any) {
+  const id = req.query.id as string;
 
-  search(query, calories)
-    .then((recipes) => res.json(recipes))
+  search(id)
+    .then((recipes) => {
+      const recetas = formato(recipes);
+      res.json(recetas)})
     .catch((error) => {
       console.error(error);
       res.status(500).json({ error: "Internal Server Error" });
@@ -68,6 +69,18 @@ export function searchByName(req: any, res: any) {
     });
 }
 
+// Funcion para devolver un objeto con solo los campos que se necesitan (filtro)
+function formato(objeto: any) {
+  return {
+  id: (objeto.recipe.uri).split("_")[1],
+  label: objeto.recipe.label,
+  image: objeto.recipe.images.SMALL,
+  calories: objeto.recipe.calories,
+  fat: objeto.recipe.totalNutrients.FAT.quantity,
+  carbs: objeto.recipe.totalNutrients.CHOCDF.quantity,
+  protein: objeto.recipe.totalNutrients.PROCNT.quantity
+  };
+}
 
 // Función para evitar repeticiones de recetas y mostrar solo ciertos campos de la receta
 function noRepeticiones(objetoJSON: any) { 
@@ -95,18 +108,11 @@ function noRepeticiones(objetoJSON: any) {
       recetasBuscadas.hits.unshift(objetoJSON.hits[i]);
     }
   }
-  // Se devuelve un objeto con solo los campos que se necesitan (filtro)
-  let Busquedas = recetasBuscadas.hits.map(hit => {
-    return {
-      uri: hit.recipe.uri,
-      label: hit.recipe.label,
-      image: hit.recipe.images.SMALL,
-      calories: hit.recipe.calories,
-      fat: hit.recipe.totalNutrients.FAT.quantity,
-      carbs: hit.recipe.totalNutrients.CHOCDF.quantity,
-      protein: hit.recipe.totalNutrients.PROCNT.quantity
-    };
-  });
+  
+  let Busquedas = [];
+  for(let i = 0; i < recetasBuscadas.hits.length; i++){
+    Busquedas.push(formato(recetasBuscadas.hits[i]));
+  }
   
   return Busquedas;
 }

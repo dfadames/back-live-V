@@ -100,11 +100,11 @@ export function searchFoodDatabase(ingr: string) {
     });
 }
 
-// Busqueda en la api filtrando de acuerdo al nombre de la receta y un aproximado de calorias
-export function search(query: string, calories: string) {
+// Busqueda en la api filtrando de acuerdo al id de la receta
+export function search(id: string) {
   return axios
     .get(
-      `https://api.edamam.com/api/recipes/v2?type=public&q=${query}&app_id=${RECIPE_APP_ID}&app_key=${RECIPE_APP_KEY}&calories=${calories}`
+      `https://api.edamam.com/api/recipes/v2/${id}?type=public&app_id=${RECIPE_APP_ID}&app_key=${RECIPE_APP_KEY}`
     )
     .then((response) => response.data)
     .catch((error) => {
