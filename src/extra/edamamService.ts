@@ -23,12 +23,40 @@ if (
 }
 
 export function searchRecipes(profileInfo: any) {
-  const edamamApiUrl = `https://api.edamam.com/api/recipes/v2?type=public&app_id=${RECIPE_APP_ID}&app_key=${RECIPE_APP_KEY}&excluded=${profileInfo.alergias}`;
+  const profile = profileInfo[0];
+  const calories = Math.round(profile.calorias_ideales_diarias / 3);
 
-  return axios
-    .get(edamamApiUrl)
-    .then((response) => response.data)
-    .catch((error) => {
+  const commonParams = {
+    app_id: RECIPE_APP_ID,
+    app_key: RECIPE_APP_KEY,
+    excluded: profile.alergias,
+    random: "true",
+    calories: `${calories - 100}-${calories + 100}`
+  };
+
+  // Parametros Edamam enviaría
+  const fields = ['uri', 'label', 'image', 'images', 'calories', 'mealType'];
+
+  // Funcion que construye en el query a mandar
+  const buildQueryString = (mealType: string) => {
+    const queryString = Object.entries(commonParams)
+      .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
+      .concat(fields.map(field => `field=${encodeURIComponent(field)}`))
+      .join('&');
+
+    return `https://api.edamam.com/api/recipes/v2?type=public&${queryString}&mealType=${encodeURIComponent(mealType)}`;
+  };
+
+  // Crear requests para cada tipo de comida
+  const breakfastPromise = axios.get(buildQueryString("Breakfast"));
+  const lunchPromise = axios.get(buildQueryString("Lunch"));
+  const dinnerPromise = axios.get(buildQueryString("Dinner"));
+
+  return Promise.all([breakfastPromise, lunchPromise, dinnerPromise])
+    .then(responses => {
+      return responses.map(response => response.data.hits.slice(0, 3)).flat();
+    })
+    .catch(error => {
       throw error;
     });
 }
