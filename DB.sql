@@ -74,10 +74,13 @@ create table Perfil (id_perfil int key not null unique,
                         calorias_ideales_diarias float as (
 							case
 								when nombre_objetivo = 'Lose Weight' then calorias_necesarias_diarias*0.85
+                                when nombre_objetivo = 'Maintain Weight' then calorias_necesarias_diarias
 								when nombre_objetivo = 'Increase muscle mass' then calorias_necesarias_diarias*1.15
 								else null
 							end
                         ),
+                        estadisticas1 varchar(200) default null,
+                        estadisticas2 varchar(200) default null,
                         foreign key (id_perfil) references Usuario (id_perfil),
                         foreign key (nombre_objetivo) references Objetivo (nombre_objetivo));
 
@@ -155,25 +158,35 @@ insert into Usuario (nombre_usuario, contrasena, correo)
 			 values ('bforerob', '12345678','emailfalso1@gmail.com');
 insert into Usuario (nombre_usuario, contrasena, correo) 
 			 values ('pepitap', '12345678','emailfalso2@gmail.com');
+insert into Usuario (nombre_usuario, contrasena, correo) 
+			 values ('fmeluko', '12345678','fmeluko@unal.edu.co');
 
 insert into Objetivo (nombre_objetivo, descripcion_objetivo) 
-			  values ('Lose Weight', 'The user currently has grade 3 obesity but has set a goal to reach 80kg in 1 year');
+			  values ('Lose Weight', 'The user is going to focus in losing weight by eating with a caloric deficit of 15%');
 insert into Objetivo (nombre_objetivo, descripcion_objetivo) 
-			  values ('Increase muscle mass', 'The user currently has underweight but has set a goal to reach 60kg in 6 months');
+			  values ('Increase muscle mass', 'The user is going to focus in increasing weight by eating with a caloric surplus of 15%');
+insert into Objetivo (nombre_objetivo, descripcion_objetivo) 
+			  values ('Maintain Weight', 'The user is going to focus in maintaining weight by eating with a caloric equilibrium');
 
-insert into Perfil (id_perfil, nombre, edad, genero, altura, peso, alergias, habitos_dietarios, nombre_objetivo, dieta, favorita, no_favorita, nivel_actividad_fisica) 
-			values (1, 'Brandolfo Steven', 20, 'Male', 1.70, 90, 'Peanut-free', 3, 'Lose Weight', 'Vegetarian', 'Agua molida', 'Changua', 'medium');
-insert into Perfil (id_perfil, nombre, edad, genero, altura, peso, alergias, habitos_dietarios, nombre_objetivo, dieta, favorita, no_favorita, nivel_actividad_fisica) 
-			values (2, 'Pepita Pérez', 20, 'Female', 1.70, 55, 'None', 3, 'Increase muscle mass', 'None', 'Pizza', 'Changua', 'high');
+insert into Perfil (id_perfil, nombre, edad, genero, altura, peso, alergias, habitos_dietarios, nombre_objetivo, dieta, favorita, no_favorita, nivel_actividad_fisica, estadisticas1, estadisticas2) 
+			values (1, 'Brandolfo Steven', 20, 'Male', 1.70, 120, 'Peanut-free', 3, 'Lose Weight', 'Vegetarian', 'Agua molida', 'Changua', 'medium', '[0, 21, 20, 15, 2, 11, 20, 21, 25, 13, 11]', '[20, 60, 20]');
+insert into Perfil (id_perfil, nombre, edad, genero, altura, peso, alergias, habitos_dietarios, nombre_objetivo, dieta, favorita, no_favorita, nivel_actividad_fisica, estadisticas1, estadisticas2) 
+			values (2, 'Pepita Pérez', 20, 'Female', 1.70, 55, 'None', 3, 'Increase muscle mass', 'None', 'Pizza', 'Changua', 'high', '[0, 15, 13, 9, 4, 11, 18, 19, 22, 10, 8]', '[40, 30, 30]');
+insert into Perfil (id_perfil, nombre, edad, genero, altura, peso, alergias, habitos_dietarios, nombre_objetivo, dieta, favorita, no_favorita, nivel_actividad_fisica, estadisticas1, estadisticas2) 
+			values (3, 'Francisco Meluk', 60, 'Male', 1.65, 70, 'None', 3, 'Maintain Weight', 'None', 'Agua molida', 'Changua', 'low', '[11, 12, 3, 14, 15, 16, 17]', '[33, 34, 33]');
 
 insert into Progreso (id_perfil, peso, imc, pgc, porcentaje_masa_magra, nivel_actividad_fisica, metabolismo_basal, fecha) 
-			  values (1, 120, 41.5225, 38.227, 61.773, 'low', 2909.4, '2023-5-1');
+			  values (1, 150, 54, 45, 70, 'low', 2909.4, '2023-5-1');
 insert into Progreso (id_perfil, peso, imc, pgc, porcentaje_masa_magra, nivel_actividad_fisica, metabolismo_basal, fecha) 
-			  values (1, 90, 31.1419, 25.7702, 74.2298, 'medium', 3120.93, '2023-10-1');
+			  values (1, 120, 41.5225, 38.227, 61.773, 'medium', 2424.5, '2023-10-1');
 insert into Progreso (id_perfil, peso, imc, pgc, porcentaje_masa_magra, nivel_actividad_fisica, metabolismo_basal, fecha) 
-			  values (2, 45, 15.5709, 17.8851, 82.1149, 'high', 2487.1, '2023-5-28');
+			  values (2, 45, 15.5709, 17.8851, 82.1149, 'high', 1200, '2023-5-28');
 insert into Progreso (id_perfil, peso, imc, pgc, porcentaje_masa_magra, nivel_actividad_fisica, metabolismo_basal, fecha) 
-			  values (2, 55, 19.0311, 22.0374, 77.9626, 'high', 2423.62, '2023-10-28');
+			  values (2, 55, 19.0311, 22.0374, 77.9626, 'high', 1405, '2023-10-28');
+insert into Progreso (id_perfil, peso, imc, pgc, porcentaje_masa_magra, nivel_actividad_fisica, metabolismo_basal, fecha) 
+			  values (3, 70, 41.5225, 38.227, 61.773, 'low', 2909.4, '2023-5-1');
+insert into Progreso (id_perfil, peso, imc, pgc, porcentaje_masa_magra, nivel_actividad_fisica, metabolismo_basal, fecha) 
+			  values (3, 70, 25.7117, 28.454, 71.546, 'low', 1442.5, '2023-10-1');
 
 insert into Dieta (nombre_dieta, descripcion_dieta) 
 		   values ('Vegetarian', 'Do not include meats');
@@ -196,11 +209,15 @@ insert into Registro_comida (id_perfil, id_plato, fecha)
 					 values (1, 1, '2023-10-31');
 insert into Registro_comida (id_perfil, id_plato, fecha) 
 					 values (2, 2, '2023-10-31');
+insert into Registro_comida (id_perfil, id_plato, fecha) 
+					 values (3, 2, '2023-10-31');
 
 insert into Objetivo_tiene_Dieta (id_objetivo, id_dieta) 
 						  values (1, 1);
 insert into Objetivo_tiene_Dieta (id_objetivo, id_dieta) 
 						  values (2, 2);
+insert into Objetivo_tiene_Dieta (id_objetivo, id_dieta) 
+						  values (3, 2);
 
 insert into Plato_pertenece_Dieta (id_plato, id_dieta) 
 						   values (1, 1);
